@@ -37,7 +37,7 @@ class TakeSelfie : AppCompatActivity() {
         btnDiagnosis = binding2.btnDiagnosis
         imageView = binding2.imageView
 
-        //click the button to launch the intent to open the camera
+        //click the button to invoke an intent to take a selfie
         btnTakeSelfie.setOnClickListener(){
             val takeSelfieIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
            photoFile = getPhotoFile(FILE_NAME)
@@ -68,7 +68,7 @@ class TakeSelfie : AppCompatActivity() {
 
 
 
-    //Take selfie and upload it to ImageView
+    //to Retrieve the selfie and display it in an ImageView
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
