@@ -7,6 +7,7 @@ import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
+import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.widget.Button
@@ -44,7 +45,8 @@ class TakeSelfie : AppCompatActivity() {
 
 
            val fileProvider = FileProvider.getUriForFile(this,"project.capstone6.fileprovider", photoFile)
-           takeSelfieIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileProvider)
+
+            takeSelfieIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileProvider)
 
             if(takeSelfieIntent.resolveActivity(this.packageManager) != null){
                 startActivityForResult(takeSelfieIntent, REQUEST_CODE)
@@ -55,12 +57,16 @@ class TakeSelfie : AppCompatActivity() {
 
         btnDiagnosis.setOnClickListener {
 
+            // Go to result page
             val intent2 = Intent(this, Result::class.java)
             startActivity(intent2)
+
+            //code to upload selfie into cloud
+
         }
     }
 
-    //to access package in specific directories
+    //to create a file for the selfie
     private fun getPhotoFile(fileName:String):File{
         val storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName,".jpg",storageDirectory)
