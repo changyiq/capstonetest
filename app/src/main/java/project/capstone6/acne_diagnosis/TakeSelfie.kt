@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.Image
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -17,16 +18,20 @@ import androidx.core.content.FileProvider
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.File
 
-private const val FILE_NAME ="selfie.jpg"
-private const val REQUEST_CODE =42
-private lateinit var photoFile: File
-
+private const val FILE_NAME ="selfie"
 class TakeSelfie : AppCompatActivity() {
 
     private lateinit var binding2: ActivityTakeSelfieBinding
     private lateinit var btnTakeSelfie : Button
     private lateinit var btnDiagnosis : Button
     private lateinit var imageView: ImageView
+    private lateinit var ImageUri: Uri
+    private lateinit var photoFile: File
+    private lateinit var fileProvider: Uri
+
+    companion object {
+        const val REQUEST_FROM_CAMERA = 1001
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +48,11 @@ class TakeSelfie : AppCompatActivity() {
             val takeSelfieIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
            photoFile = getPhotoFile(FILE_NAME)
 
-
-           val fileProvider = FileProvider.getUriForFile(this,"project.capstone6.fileprovider", photoFile)
-
+           fileProvider = FileProvider.getUriForFile(this,"project.capstone6.fileprovider", photoFile)
             takeSelfieIntent.putExtra(MediaStore.EXTRA_OUTPUT,fileProvider)
 
             if(takeSelfieIntent.resolveActivity(this.packageManager) != null){
-                startActivityForResult(takeSelfieIntent, REQUEST_CODE)
+                startActivityForResult(takeSelfieIntent, REQUEST_FROM_CAMERA)
             }else{
                 Toast.makeText(this,"Unable to open camera",Toast.LENGTH_LONG).show()
             }
@@ -76,9 +79,12 @@ class TakeSelfie : AppCompatActivity() {
 
     //to Retrieve the selfie and display it in an ImageView
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if(requestCode == REQUEST_CODE && resultCode == Activity.RESULT_OK){
+        if(requestCode == REQUEST_FROM_CAMERA && resultCode == Activity.RESULT_OK){
+
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
             imageView.setImageBitmap(takenImage)
+            Toast.makeText(this, "image saved", Toast.LENGTH_SHORT).show()
+            FirebaseStorageManager().uploadImage(this, fileProvider)
         } else{
             super.onActivityResult(requestCode, resultCode, data)
         }
