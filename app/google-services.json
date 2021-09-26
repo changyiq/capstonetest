@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "520981538611",
+    "project_id": "acne-diagnosis-6a653",
+    "storage_bucket": "acne-diagnosis-6a653.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:520981538611:android:541dffb30ee1f0eb9d8046",
+        "android_client_info": {
+          "package_name": "project.capstone6.acne_diagnosis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "520981538611-b1e1cdgu0mhcem9i4g96rrm7cch95618.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuSsvevsktpIBXZLmwgXAPwaczrvLJfQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "520981538611-b1e1cdgu0mhcem9i4g96rrm7cch95618.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
