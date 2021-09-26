@@ -102,7 +102,7 @@ public class RegisterActivity extends AppCompatActivity {
         // check if the user is exit when use google sign in
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if(signInAccount != null){
-            startActivity(new Intent(this, MainActivity.class));
+            startActivity(new Intent(this, TakeSelfie.class));
         }
         signInButton.setOnClickListener(view -> {
             Intent sign = googleSignInClient.getSignInIntent();
@@ -138,7 +138,7 @@ public class RegisterActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                 if( currentUser != null){
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), TakeSelfie.class));
                     finish();
                 }
             }
@@ -179,7 +179,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(RegisterActivity.this, "Account created", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                            startActivity(new Intent(getApplicationContext(), TakeSelfie.class));
                         } else {
                             Toast.makeText(RegisterActivity.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -216,7 +216,7 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Toast.makeText(getApplicationContext(), "Your Google account is connected to our application", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), TakeSelfie.class));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -239,7 +239,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Toast.makeText(getApplicationContext(), "Your Facebook account is connected to our application", Toast.LENGTH_SHORT).show();
                     //FirebaseUser user = firebaseAuth.getCurrentUser();
-                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                    startActivity(new Intent(getApplicationContext(), TakeSelfie.class));
                 } else {
                     Toast.makeText(RegisterActivity.this, "Authentication failed" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
