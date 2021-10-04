@@ -57,15 +57,12 @@ class TakeSelfie : AppCompatActivity() {
                 Toast.makeText(this,"Unable to open camera",Toast.LENGTH_LONG).show()
             }
         }
-
         btnDiagnosis.setOnClickListener {
 
             // Go to result page
             val intent2 = Intent(this, Result::class.java)
             startActivity(intent2)
-
             //code to upload selfie into cloud
-
         }
     }
 
@@ -77,7 +74,7 @@ class TakeSelfie : AppCompatActivity() {
 
 
 
-    //to Retrieve the selfie and display it in an ImageView
+    //to Retrieve the selfie， display it in an ImageView and upload into Firebase cloud
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_FROM_CAMERA && resultCode == Activity.RESULT_OK){
 

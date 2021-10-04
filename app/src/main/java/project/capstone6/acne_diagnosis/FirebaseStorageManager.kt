@@ -11,6 +11,8 @@ class FirebaseStorageManager {
 
     private val mStorageRef = FirebaseStorage.getInstance().reference
     private lateinit var mProgressDialog: ProgressDialog
+
+    //upload image into firebase cloud.
     fun uploadImage(context: Context, imageFileUri: Uri) {
         mProgressDialog = ProgressDialog(context)
         mProgressDialog.setMessage("Please wait, image being upload")
