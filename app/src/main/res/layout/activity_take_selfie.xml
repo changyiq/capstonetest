@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="63dp"
         android:layout_marginBottom="41dp"
-        android:backgroundTint="@android:color/holo_green_light"
+        android:backgroundTint="@color/black"
         android:text="@string/take_selfie"
-        android:textColor="#616161"
+        android:textColor="@color/white"
         android:textSize="24sp"
         app:iconPadding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/imageView"
@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnTakeSelfie"
-        app:srcCompat="@android:drawable/ic_menu_camera"
+        app:srcCompat="@drawable/backimage"
         tools:ignore="ContentDescription,ImageContrastCheck" />
 
     <Button
@@ -43,9 +43,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="75dp"
-        android:backgroundTint="@android:color/holo_green_light"
+        android:backgroundTint="@android:color/black"
         android:text="@string/diagnosis"
-        android:textColor="#616161"
+        android:textColor="@color/white"
         android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
