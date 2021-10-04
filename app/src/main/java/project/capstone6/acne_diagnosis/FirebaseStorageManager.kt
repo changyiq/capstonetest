@@ -18,11 +18,11 @@ class FirebaseStorageManager {
         mProgressDialog.setMessage("Please wait, image being upload")
         mProgressDialog.show()
         val date = Date()
-        val uploadTask = mStorageRef.child("posts/${date}.png").putFile(imageFileUri)
+        val uploadTask = mStorageRef.child("Test1/Pictures/${date}.png").putFile(imageFileUri)
         uploadTask.addOnSuccessListener {
             Log.e("Frebase", "Image Upload success")
             mProgressDialog.dismiss()
-            val uploadedURL = mStorageRef.child("posts/${date}.png").downloadUrl
+            val uploadedURL = mStorageRef.child("Test1/Pictures/${date}.png").downloadUrl
             Log.e("Firebase", "Uploaded $uploadedURL")
         }.addOnFailureListener {
             Log.e("Frebase", "Image Upload fail")
