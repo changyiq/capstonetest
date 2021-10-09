@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
-import com.facebook.AccessToken
 import com.facebook.AccessTokenTracker
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -26,13 +24,8 @@ class Result : AppCompatActivity() {
     private lateinit var binding3: ActivityResultBinding
     private lateinit var btnAgain: Button
     private lateinit var btnExit: Button
-    private lateinit var binding3:ActivityResultBinding
-    private lateinit var btnAgain:Button
-    private lateinit var btnExit:Button
     private lateinit var tvResult: TextView
 
-    var authStateListener: AuthStateListener? = null
-    var accessTokenTracker: AccessTokenTracker? = null
     var firebaseAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,7 +87,5 @@ class Result : AppCompatActivity() {
         firebaseAuth!!.signOut()
         LoginManager.getInstance().logOut()
         finish()
-
-
     }
 }
