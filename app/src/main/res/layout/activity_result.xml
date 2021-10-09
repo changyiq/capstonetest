@@ -6,8 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".Result">
 
-    <EditText
-        android:id="@+id/editTextTextMultiLine"
+    <TextView
+        android:id="@+id/tvResult"
         android:layout_width="0dp"
         android:layout_height="76dp"
         android:layout_marginStart="12dp"
