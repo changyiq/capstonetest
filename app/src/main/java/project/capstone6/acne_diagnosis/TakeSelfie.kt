@@ -36,7 +36,7 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var photoFile: File
     private lateinit var fileProvider: Uri
 
-    private var subDir: String =""
+    private lateinit var subDir: String
 
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
@@ -72,13 +72,13 @@ class TakeSelfie : AppCompatActivity() {
             if(subDir != "" && subDir != null){
                 // call intent to go to result page
                 val intent = Intent(this, Result::class.java)
-                startActivity(intent)
 
                 //pass subdirectory information to Result page
+                Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_SUBDIRECTORY,subDir)
-                Toast.makeText(this,"Subdir is " + subDir,Toast.LENGTH_LONG).show()
-                //trigger and pass subdirectory to REST API
+                startActivity(intent)
 
+                //trigger and pass subdirectory to REST API
             }
         }
     }

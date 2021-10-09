@@ -41,7 +41,7 @@ class Result : AppCompatActivity() {
 
         //Get subdirectory
         val intent = getIntent()
-        val subDir= intent.getStringArrayExtra(TakeSelfie.EXTRA_SUBDIRECTORY)
+        val subDir= intent.getStringExtra(TakeSelfie.EXTRA_SUBDIRECTORY)
         Toast.makeText(this,"Subdir is " + subDir, Toast.LENGTH_LONG).show()
         tvResult.text = "Diagnosing..."
 
