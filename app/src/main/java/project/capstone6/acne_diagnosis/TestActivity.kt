@@ -10,9 +10,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import project.capstone6.acne_diagnosis.databinding.ActivityMainBinding
-import java.io.File
 
-class MainActivity : AppCompatActivity() {
+
+class TestActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
             .addOnSuccessListener { startActivity(Intent(view.context, LoginActivity::class.java)) }
             .addOnFailureListener {
                 Toast.makeText(
-                    this@MainActivity,
+                    this,
                     "Sign out failed",
                     Toast.LENGTH_SHORT
                 ).show()
