@@ -1,6 +1,8 @@
 package project.capstone6.acne_diagnosis
 
 import android.app.Activity
+import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.Image
@@ -10,13 +12,18 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.storage.FirebaseStorage
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.File
+import java.util.*
 
 private const val FILE_NAME ="selfie"
 class TakeSelfie : AppCompatActivity() {
@@ -29,8 +36,11 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var photoFile: File
     private lateinit var fileProvider: Uri
 
+    private var subDir: String =""
+
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
+        const val EXTRA_SUBDIRECTORY = "SavedSubdirectory"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +69,17 @@ class TakeSelfie : AppCompatActivity() {
         }
         btnDiagnosis.setOnClickListener {
 
-            // Go to result page
-            val intent2 = Intent(this, Result::class.java)
-            startActivity(intent2)
-            //code to upload selfie into cloud
+            if(subDir != "" && subDir != null){
+                // call intent to go to result page
+                val intent = Intent(this, Result::class.java)
+                startActivity(intent)
+
+                //pass subdirectory information to Result page
+                intent.putExtra(EXTRA_SUBDIRECTORY,subDir)
+                Toast.makeText(this,"Subdir is " + subDir,Toast.LENGTH_LONG).show()
+                //trigger and pass subdirectory to REST API
+
+            }
         }
     }
 
@@ -72,8 +89,6 @@ class TakeSelfie : AppCompatActivity() {
         return File.createTempFile(fileName,".jpg",storageDirectory)
     }
 
-
-
     //to Retrieve the selfie， display it in an ImageView and upload into Firebase cloud
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if(requestCode == REQUEST_FROM_CAMERA && resultCode == Activity.RESULT_OK){
@@ -81,7 +96,9 @@ class TakeSelfie : AppCompatActivity() {
             val takenImage = BitmapFactory.decodeFile(photoFile.absolutePath)
             imageView.setImageBitmap(takenImage)
             Toast.makeText(this, "image saved", Toast.LENGTH_SHORT).show()
-            FirebaseStorageManager().uploadImage(this, fileProvider)
+
+            //uploadImage(this, fileProvider)
+            subDir = FirebaseStorageManager().uploadImage(this, fileProvider)
         } else{
             super.onActivityResult(requestCode, resultCode, data)
         }

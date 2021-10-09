@@ -2,8 +2,10 @@ package project.capstone6.acne_diagnosis
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
@@ -17,13 +19,13 @@ class FirebaseStorageManager {
     private var subDir: String =""
 
     //upload image into firebase cloud.
-    fun uploadImage(context: Context, imageFileUri: Uri) {
+    fun uploadImage(context: Context, imageFileUri: Uri):String {
         mProgressDialog = ProgressDialog(context)
         mProgressDialog.setMessage("Please wait, image being upload")
         mProgressDialog.show()
         val date = Date()
         user = FirebaseAuth.getInstance().getCurrentUser();
-        subDir = user?.uid + "/${user?.uid} - ${date}/"
+        subDir = user?.uid + "/${date}/"
 
         //val uploadTask = mStorageRef.child("Test1/Pictures/${date}.png").putFile(imageFileUri)
         val uploadTask = mStorageRef.child(subDir+"Selifie.png").putFile(imageFileUri)
@@ -37,5 +39,7 @@ class FirebaseStorageManager {
             Log.e("Frebase", "Image Upload fail")
             mProgressDialog.dismiss()
         }
+
+        return subDir
     }
 }
