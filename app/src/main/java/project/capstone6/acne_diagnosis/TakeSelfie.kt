@@ -36,11 +36,13 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var photoFile: File
     private lateinit var fileProvider: Uri
 
+    private lateinit var subDir: String
     private lateinit var fullDir: String
 
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
         const val EXTRA_FULLDIRECTORY = "SavedFulldirectory"
+        const val EXTRA_SUBDIRECTORY = "SavedSubdirectory"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,16 +71,20 @@ class TakeSelfie : AppCompatActivity() {
         }
         btnDiagnosis.setOnClickListener {
 
-            if(fullDir != "" && fullDir != null){
+            if(subDir != "" && subDir != null){
                 // call intent to go to result page
                 val intent = Intent(this, Result::class.java)
 
                 //pass fulldirectory information to Result page
-                Toast.makeText(this," Save Fulldir as " + fullDir,Toast.LENGTH_LONG).show()
+                Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_FULLDIRECTORY,fullDir)
+                intent.putExtra(EXTRA_SUBDIRECTORY,subDir)
                 startActivity(intent)
 
                 //trigger and pass FULLDirectory to REST API
+
+                //clear subDir
+                subDir =""
             }
         }
     }
@@ -98,7 +104,8 @@ class TakeSelfie : AppCompatActivity() {
             Toast.makeText(this, "image saved", Toast.LENGTH_SHORT).show()
 
             //uploadImage(this, fileProvider)
-            fullDir = FirebaseStorageManager().uploadImage(this, fileProvider)
+            subDir = FirebaseStorageManager().uploadImage(this, fileProvider)
+            fullDir = "gs://acne-diagnosis-6a653.appspot.com/" + subDir
         } else{
             super.onActivityResult(requestCode, resultCode, data)
         }
