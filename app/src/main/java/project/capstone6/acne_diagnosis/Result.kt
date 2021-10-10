@@ -42,7 +42,7 @@ class Result : AppCompatActivity() {
         //Get fulldirectory
         val intent = getIntent()
         val fullDir= intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY)
-        Toast.makeText(this,"FullDir is " + fullDir, Toast.LENGTH_LONG).show()
+        //Toast.makeText(this,"FullDir is " + fullDir, Toast.LENGTH_LONG).show()
         tvResult.text = "Diagnosing..."
 
         btnAgain.setOnClickListener {

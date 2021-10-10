@@ -18,15 +18,24 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import com.android.volley.*
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
+import org.json.JSONException
+import org.json.JSONObject
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.File
+import java.nio.charset.Charset
 import java.util.*
 
 private const val FILE_NAME ="selfie"
 class TakeSelfie : AppCompatActivity() {
+
+    val TAG ="TakeSelfie"
 
     private lateinit var binding2: ActivityTakeSelfieBinding
     private lateinit var btnTakeSelfie : Button
@@ -38,6 +47,12 @@ class TakeSelfie : AppCompatActivity() {
 
     private lateinit var subDir: String
     private lateinit var fullDir: String
+
+    var volleyRequestQueue: RequestQueue? = null
+   // val url: String = "https://postman-echo.com/post"
+    //https://reqres.in/api/users
+   val url: String = "https://reqres.in/api/dir"
+    var dialog: ProgressDialog? = null
 
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
@@ -76,12 +91,13 @@ class TakeSelfie : AppCompatActivity() {
                 val intent = Intent(this, Result::class.java)
 
                 //pass fulldirectory information to Result page
-                Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
+                //Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_FULLDIRECTORY,fullDir)
                 intent.putExtra(EXTRA_SUBDIRECTORY,subDir)
                 startActivity(intent)
 
-                //trigger and pass FULLDirectory to REST API
+                //pass directory to API
+                postVolley(fullDir,subDir)
 
                 //clear subDir
                 subDir =""
@@ -109,5 +125,47 @@ class TakeSelfie : AppCompatActivity() {
         } else{
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    fun postVolley(fullDirectory: String, subDirectory: String) {
+
+        // Post parameters
+        // Form fields and values
+        val params = HashMap<String,String>()
+        params["fullDirectory"] = fullDirectory
+        params["subDirectory"] = subDirectory
+        val jsonObject = JSONObject(params as Map<*, *>)
+
+        // Volley post request with parameters
+        val request = JsonObjectRequest(
+            Request.Method.POST,url,jsonObject,
+            Response.Listener { response ->
+                // Process the json
+                try {
+                    //textView.text = "Response: $response"
+                    Toast.makeText(this, "Message sending to API. \nResponse: \n$response", Toast.LENGTH_LONG).show()
+                }catch (e:Exception){
+                    //textView.text = "Exception: $e"
+                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
+                }
+
+            }, Response.ErrorListener{
+                // Error in request
+                //textView.text = "Volley error: $it"
+                Toast.makeText(this, "Volley error: $it", Toast.LENGTH_LONG).show()
+            })
+
+
+        // Volley request policy, only one time request to avoid duplicate transaction
+        request.retryPolicy = DefaultRetryPolicy(
+            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+            // 0 means no retry
+            0, // DefaultRetryPolicy.DEFAULT_MAX_RETRIES = 2
+            1f // DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+        )
+
+        // Add the volley post request to the request queue
+        VolleySingleton.getInstance(this).addToRequestQueue(request)
+
     }
 }
