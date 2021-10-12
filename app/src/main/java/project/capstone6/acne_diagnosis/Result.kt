@@ -39,10 +39,10 @@ class Result : AppCompatActivity() {
         btnExit = binding3.btnExit
         tvResult = binding3.tvResult
 
-        //Get subdirectory
+        //Get fulldirectory
         val intent = getIntent()
-        val subDir= intent.getStringArrayExtra(TakeSelfie.EXTRA_SUBDIRECTORY)
-        Toast.makeText(this,"Subdir is " + subDir, Toast.LENGTH_LONG).show()
+        val fullDir= intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY)
+        //Toast.makeText(this,"FullDir is " + fullDir, Toast.LENGTH_LONG).show()
         tvResult.text = "Diagnosing..."
 
         btnAgain.setOnClickListener {

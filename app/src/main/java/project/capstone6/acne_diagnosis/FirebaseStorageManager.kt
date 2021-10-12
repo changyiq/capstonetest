@@ -16,7 +16,7 @@ class FirebaseStorageManager {
     private val mStorageRef = FirebaseStorage.getInstance().reference
     private lateinit var mProgressDialog: ProgressDialog
     private var user: FirebaseUser? = null
-    private var subDir: String =""
+    private lateinit var subDir: String
 
     //upload image into firebase cloud.
     fun uploadImage(context: Context, imageFileUri: Uri):String {
@@ -39,7 +39,6 @@ class FirebaseStorageManager {
             Log.e("Frebase", "Image Upload fail")
             mProgressDialog.dismiss()
         }
-
         return subDir
     }
 }
