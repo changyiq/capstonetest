@@ -143,7 +143,7 @@ class TakeSelfie : AppCompatActivity() {
                 // Process the json
                 try {
                     //textView.text = "Response: $response"
-                    Toast.makeText(this, "Message sending to API. \nResponse: \n$response", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Response: \nMessage be posted to API. \n$response", Toast.LENGTH_LONG).show()
                 }catch (e:Exception){
                     //textView.text = "Exception: $e"
                     Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
