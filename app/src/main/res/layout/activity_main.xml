@@ -12,6 +12,6 @@
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp"
-        tools:listitem="@layout/home_feed" />
+        tools:listitem="@layout/news_feeds" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
