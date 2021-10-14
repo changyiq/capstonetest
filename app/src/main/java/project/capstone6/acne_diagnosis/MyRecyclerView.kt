@@ -8,16 +8,15 @@ package project.capstone6.acne_diagnosis
    This is the recycler view, in this class, the layout resources are accessed using findViewById,
    and set the view to current item, then set to make a toast message when click the item.
  */
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Intent as Intent1
 
 class MyRecyclerView(private val newsList: List<NewsFeeds>) :
     RecyclerView.Adapter<MyRecyclerView.MyViewHolder>() {
@@ -25,9 +24,8 @@ class MyRecyclerView(private val newsList: List<NewsFeeds>) :
 
     class MyViewHolder(newView: View) : RecyclerView.ViewHolder(newView) {
 
-        val imageView: ImageView = itemView.findViewById(R.id.img1)
+        val imageView: ImageView = itemView.findViewById(R.id.img)
         val newsView: TextView = itemView.findViewById(R.id.newsView)
-        //val redoButton: Button = itemView.findViewById(R.id.redoButton)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -46,10 +44,6 @@ class MyRecyclerView(private val newsList: List<NewsFeeds>) :
 
         holder.imageView.setImageResource(currentItem.imageResource)
         holder.newsView.text = currentItem.newsFeed
-
-//        holder.redoButton.setOnClickListener {
-//
-//        }
     }
 
 

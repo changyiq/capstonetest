@@ -5,11 +5,10 @@
     <string name="todo">TODO</string>
     <string name="facebook_app_id">583949306361746</string>
     <string name="fb_login_protocol_scheme">fb583949306361746</string>
+    <string name="redo_analysis">Redo Analysis</string>
     <string name="feed1">Integer malesuada a lorem at ornare.
         In elementum est eu massa malesuada, a tempor ipsum placerat. Ut pretium diam est.
-        Praesent a massa ultrices, pretium ligula ac, fermentum ligula. Fusce laoreet aliquet lobortis.
-        Nam cursus ante vitae sodales eleifend. Proin nec pharetra risus, eget porttitor eros.
-        Morbi ac condimentum augue.</string>
+        Praesent a massa ultrices.</string>
     <string name="feed2">Suspendisse feugiat mollis nisi, sit amet vehicula urna mollis sed. Mauris
         ornare felis ut pellentesque aliquet. Nunc hendrerit leo a scelerisque efficitur. Fusce vel
         ex imperdiet, ultrices nisl ut, luctus risus. In fringilla eget massa sed tempus. Aenean
