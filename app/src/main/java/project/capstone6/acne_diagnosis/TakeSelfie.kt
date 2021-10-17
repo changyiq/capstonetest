@@ -49,9 +49,9 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var fullDir: String
 
     var volleyRequestQueue: RequestQueue? = null
-   // val url: String = "https://postman-echo.com/post"
-    //https://reqres.in/api/users
-   val url: String = "https://reqres.in/api/dir"
+    val url: String = "http://localhost:49623/"
+   //val url: String = "https://reqres.in/api/dir"
+
     var dialog: ProgressDialog? = null
 
     companion object {
