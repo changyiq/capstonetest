@@ -14,6 +14,8 @@ import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -22,6 +24,9 @@ import com.android.volley.*
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.facebook.login.LoginManager
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
@@ -49,10 +54,12 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var fullDir: String
 
     var volleyRequestQueue: RequestQueue? = null
-    val url: String = "http://localhost:49623/"
-   //val url: String = "https://reqres.in/api/dir"
+    //val url: String = "http://localhost:49623/"
+    val url: String = "https://reqres.in/api/dir"
 
     var dialog: ProgressDialog? = null
+
+    var firebaseAuth: FirebaseAuth? = null
 
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
@@ -69,6 +76,12 @@ class TakeSelfie : AppCompatActivity() {
         btnTakeSelfie = binding2.btnTakeSelfie
         btnDiagnosis = binding2.btnDiagnosis
         imageView = binding2.imageView
+
+
+
+        // Initialise Firebase
+        firebaseAuth = FirebaseAuth.getInstance()
+        val currentUser = firebaseAuth!!.currentUser
 
         //click the button to invoke an intent to take a selfie
         btnTakeSelfie.setOnClickListener(){
@@ -167,5 +180,60 @@ class TakeSelfie : AppCompatActivity() {
         // Add the volley post request to the request queue
         VolleySingleton.getInstance(this).addToRequestQueue(request)
 
+    }
+
+    //process menu
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+        val inflater = menuInflater
+        inflater.inflate(R.menu.takeselfiemenu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_result -> {
+            val intent = Intent(this, Result::class.java)
+            startActivity(intent)
+            true
+        }
+        R.id.action_homepage -> {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            true
+        }
+        R.id.action_exit -> {
+            logOut()
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun logOut() {
+
+        startActivity(Intent(applicationContext, LoginActivity::class.java))
+
+        // get google sign in status
+        GoogleSignIn.getClient(
+            this,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
+        )
+            .signOut()
+            .addOnSuccessListener { startActivity(Intent(this, LoginActivity::class.java)) }
+            .addOnFailureListener {
+                Toast.makeText(
+                    this,
+                    "Sign out failed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        finish()
+
+        // Facebook login status check
+        val currentUser = firebaseAuth!!.currentUser
+        firebaseAuth!!.signOut()
+        LoginManager.getInstance().logOut()
+        finish()
     }
 }
