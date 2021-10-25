@@ -205,7 +205,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Log in successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), Result.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         } else {
                             Toast.makeText(LoginActivity.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -298,7 +298,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Toast.makeText(getApplicationContext(), "Your Google account is connected to our application", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(getApplicationContext(), Result.class));
+                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
