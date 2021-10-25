@@ -13,9 +13,7 @@ import android.os.Environment
 import android.os.Environment.getExternalStoragePublicDirectory
 import android.provider.MediaStore
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -30,9 +28,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.storage.FirebaseStorage
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import project.capstone6.acne_diagnosis.apis.NetworkClient
+import project.capstone6.acne_diagnosis.apis.UploadAPis
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Retrofit
 import java.io.File
 import java.nio.charset.Charset
 import java.util.*
@@ -41,6 +47,7 @@ private const val FILE_NAME ="selfie"
 class TakeSelfie : AppCompatActivity() {
 
     val TAG ="TakeSelfie"
+    var filePath = ""
 
     private lateinit var binding2: ActivityTakeSelfieBinding
     private lateinit var btnTakeSelfie : Button
@@ -55,7 +62,7 @@ class TakeSelfie : AppCompatActivity() {
 
     var volleyRequestQueue: RequestQueue? = null
     //val url: String = "http://localhost:49623/"
-    val url: String = "https://reqres.in/api/dir"
+    val url: String = "https://reqres.in/api/dir;https://localhost:5001;http://localhost:5000"
 
     var dialog: ProgressDialog? = null
 
@@ -76,8 +83,6 @@ class TakeSelfie : AppCompatActivity() {
         btnTakeSelfie = binding2.btnTakeSelfie
         btnDiagnosis = binding2.btnDiagnosis
         imageView = binding2.imageView
-
-
 
         // Initialise Firebase
         firebaseAuth = FirebaseAuth.getInstance()
@@ -111,6 +116,7 @@ class TakeSelfie : AppCompatActivity() {
 
                 //pass directory to API
                 postVolley(fullDir,subDir)
+                uploadImage()
 
                 //clear subDir
                 subDir =""
@@ -180,6 +186,28 @@ class TakeSelfie : AppCompatActivity() {
         // Add the volley post request to the request queue
         VolleySingleton.getInstance(this).addToRequestQueue(request)
 
+    }
+
+    fun uploadImage() {
+        Log.e("Swagger", "Uploading")
+
+        val file = File(filePath)
+        val requestBody = RequestBody.create(MediaType.parse("api/Image/*"), file)
+        val parts = MultipartBody.Part.createFormData("newimage", file.name, requestBody)
+        val imgdata = RequestBody.create(MediaType.parse("text/plain"), "This is a new image")
+        val retrofit: Retrofit = NetworkClient.retrofit!!
+        val uploadAPis = retrofit.create(UploadAPis::class.java)
+        val call: Call<*>? = uploadAPis.uploadImage(parts, imgdata)
+        call!!.enqueue(object : Callback<Any?> {
+            override fun onResponse(call: Call<Any?>, response: retrofit2.Response<Any?>) {
+                Log.e("Swagger", "Not yet implemented")
+            }
+
+            override fun onFailure(call: Call<Any?>, t: Throwable) {
+                Log.e("Swagger", "failure")
+            }
+
+        } as Nothing)
     }
 
     //process menu
