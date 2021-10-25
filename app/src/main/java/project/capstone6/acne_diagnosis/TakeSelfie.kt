@@ -54,8 +54,8 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var fullDir: String
 
     var volleyRequestQueue: RequestQueue? = null
-    //val url: String = "http://localhost:49623/"
-    val url: String = "https://reqres.in/api/dir"
+    val url: String = "http://localhost:44374/api/Dir"
+    //val url: String = "https://reqres.in/api/dir"
 
     var dialog: ProgressDialog? = null
 
@@ -76,8 +76,6 @@ class TakeSelfie : AppCompatActivity() {
         btnTakeSelfie = binding2.btnTakeSelfie
         btnDiagnosis = binding2.btnDiagnosis
         imageView = binding2.imageView
-
-
 
         // Initialise Firebase
         firebaseAuth = FirebaseAuth.getInstance()
