@@ -35,12 +35,15 @@ class Website : AppCompatActivity()  {
         web.loadUrl(url.toString())
     }
 
+    // embedded menu into view
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
 
         val inflater = menuInflater
         inflater.inflate(R.menu.menu, menu)
         return true
     }
+
+    // setup the menu
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_result -> {
             val intent = Intent(this, Result::class.java)

@@ -112,6 +112,7 @@ class Result : AppCompatActivity() {
                     hybirdLink1.text = getWebsite(symptom)[0]
                     hybirdLink2.text = getWebsite(symptom)[1]
 
+                    // pass the url info based on the clicked link
                     val intent = Intent(this, Website::class.java)
                     hybirdLink1.setOnClickListener(){
                         intent.putExtra("URL", hybirdLink1.text.toString())
@@ -131,6 +132,7 @@ class Result : AppCompatActivity() {
         }
     }
 
+    // get website links based on the symptom using enum classes
     private fun getWebsite(sym: String): List<String> {
         when(sym){
             SymptomEnum.AD.symptom -> linkList = listOf(MedicalResourcesEnum.AD.website)
