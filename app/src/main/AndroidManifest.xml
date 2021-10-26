@@ -48,6 +48,9 @@
             android:name=".Result"
             android:exported="true" />
         <activity
+            android:name=".Website"
+            android:exported="true" />
+        <activity
             android:name=".TakeSelfie"
             android:exported="true" />
 

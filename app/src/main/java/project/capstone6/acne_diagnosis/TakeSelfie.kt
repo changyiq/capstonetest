@@ -159,8 +159,7 @@ class TakeSelfie : AppCompatActivity() {
                     myRef.child(uid.toString()).child("image").setValue(fullDir)
                 }else if (!it.child("image").exists()){
                     myRef.child(uid.toString()).child("image").setValue(fullDir)
-                    myRef.child(uid.toString()).child("level").setValue("2")
-                    myRef.child(uid.toString()).child("result").setValue("Not bad")
+                    //myRef.child(uid.toString()).child("result").setValue(SymptomEnum.AD)
                 }
             }
         } else{
@@ -195,7 +194,6 @@ class TakeSelfie : AppCompatActivity() {
                 //textView.text = "Volley error: $it"
                 Toast.makeText(this, "Volley error: $it", Toast.LENGTH_LONG).show()
             })
-
 
         // Volley request policy, only one time request to avoid duplicate transaction
         request.retryPolicy = DefaultRetryPolicy(

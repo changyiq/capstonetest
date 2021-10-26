@@ -25,12 +25,17 @@ class Result : AppCompatActivity() {
     private lateinit var btnAgain: Button
     private lateinit var btnExit: Button
     private lateinit var tvResult: TextView
-    private lateinit var pBarSeverity: ProgressBar
+    private lateinit var hybirdLink1: TextView
+    private lateinit var hybirdLink2: TextView
     private lateinit var memeImageView: ImageView
     private lateinit var resultText: TextView
     private lateinit var database: Firebase
     private lateinit var ref: DatabaseReference
     private lateinit var picPath: String
+    private lateinit var symptom: String
+    private lateinit var linkList: List<String>
+
+    var receivedResult: String = ""
 
     var firebaseAuth: FirebaseAuth? = null
 
@@ -43,6 +48,8 @@ class Result : AppCompatActivity() {
 
         btnAgain = binding3.btnAgain
         btnExit = binding3.btnExit
+        hybirdLink1 = binding3.medicalRtv1
+        hybirdLink2 = binding3.medicalRtv2
         //tvResult = binding3.tvResult
 
         //Get fulldirectory
@@ -63,10 +70,6 @@ class Result : AppCompatActivity() {
         btnExit.setOnClickListener {
             logOut()
         }
-
-        pBarSeverity = binding3.severityLevel
-        pBarSeverity.max = 12
-        // level 2-4-8-12
 
         getUser()
         loadResult()
@@ -90,17 +93,35 @@ class Result : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user?.uid
 
+//        // code to get the response from api and filter the keyword of the symptom and provide user
+//        // medical resources
+//        receivedResult = "Acne and Rosacea photos"
+//        for(sym in SymptomEnum.values()){
+//            if (receivedResult.contains(sym.symptom)){
+//                symptom = sym.symptom
+//            }
+//        }
+
         //Get column from the table
         // if exists, then fetch the data and update the UI
         myRef.child(uid.toString()).get().addOnSuccessListener {
             if (it.exists()) {
                 if (it.child("image").exists()) {
-                    val diagResul = it.child("result").value
-                    val level = it.child("level").value
-                    val imageUri = it.child("image").value
+                    symptom = SymptomEnum.AR.symptom
+                    myRef.child(uid.toString()).child("result").setValue(symptom)
+                    hybirdLink1.text = getWebsite(symptom)[0]
+                    hybirdLink2.text = getWebsite(symptom)[1]
 
-                    binding3.skinProblem.text = diagResul.toString() + "\n"+ imageUri.toString()
-                    pBarSeverity.progress = level.toString().toInt()
+                    val intent = Intent(this, Website::class.java)
+                    hybirdLink1.setOnClickListener(){
+                        intent.putExtra("URL", hybirdLink1.text.toString())
+                        startActivity(intent)
+                    }
+                    hybirdLink2.setOnClickListener(){
+                        intent.putExtra("URL", hybirdLink2.text.toString())
+                        startActivity(intent)
+                    }
+                    true
                 }else {
                     Toast.makeText(this, "You have not made any analysis", Toast.LENGTH_SHORT).show()
                 }
@@ -108,6 +129,35 @@ class Result : AppCompatActivity() {
                 Toast.makeText(this, "Invalid user", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun getWebsite(sym: String): List<String> {
+        when(sym){
+            SymptomEnum.AD.symptom -> linkList = listOf(MedicalResourcesEnum.AD.website)
+            SymptomEnum.AM.symptom -> linkList = listOf(MedicalResourcesEnum.AM.website)
+            SymptomEnum.AR.symptom -> linkList = listOf(MedicalResourcesEnum.AR1.website, MedicalResourcesEnum.AR2.website)
+            SymptomEnum.BD.symptom -> linkList = listOf(MedicalResourcesEnum.BD.website)
+            SymptomEnum.CI.symptom -> linkList = listOf(MedicalResourcesEnum.CI.website)
+            SymptomEnum.EC.symptom -> linkList = listOf(MedicalResourcesEnum.EC.website)
+            SymptomEnum.EDE.symptom -> linkList = listOf(MedicalResourcesEnum.EDE.website)
+            SymptomEnum.HAIR.symptom -> linkList = listOf(MedicalResourcesEnum.HAIR.website)
+            SymptomEnum.HPV.symptom -> linkList = listOf(MedicalResourcesEnum.HPV.website)
+            SymptomEnum.PI.symptom -> linkList = listOf(MedicalResourcesEnum.PI.website)
+            SymptomEnum.CTD.symptom -> linkList = listOf(MedicalResourcesEnum.CTD.website)
+            SymptomEnum.MM.symptom -> linkList = listOf(MedicalResourcesEnum.MM1.website, MedicalResourcesEnum.MM2.website)
+            SymptomEnum.NAIL.symptom -> linkList = listOf(MedicalResourcesEnum.NAIL.website)
+            SymptomEnum.CD.symptom -> linkList = listOf(MedicalResourcesEnum.CD.website)
+            SymptomEnum.PSO.symptom -> linkList = listOf(MedicalResourcesEnum.PSO.website)
+            SymptomEnum.SLD.symptom -> linkList = listOf(MedicalResourcesEnum.SLD.website)
+            SymptomEnum.SK.symptom -> linkList = listOf(MedicalResourcesEnum.SK.website)
+            SymptomEnum.SD.symptom -> linkList = listOf(MedicalResourcesEnum.SD.website)
+            SymptomEnum.TRC.symptom -> linkList = listOf(MedicalResourcesEnum.TRC.website)
+            SymptomEnum.UH.symptom -> linkList = listOf(MedicalResourcesEnum.UH.website)
+            SymptomEnum.VP.symptom -> linkList = listOf(MedicalResourcesEnum.VP.website)
+            SymptomEnum.VT.symptom -> linkList = listOf(MedicalResourcesEnum.VT.website)
+            SymptomEnum.WM.symptom -> linkList = listOf(MedicalResourcesEnum.WM.website)
+        }
+        return  linkList
     }
 
     fun logOut() {
