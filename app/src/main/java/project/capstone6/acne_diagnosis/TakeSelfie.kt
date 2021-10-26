@@ -27,6 +27,7 @@ import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import org.json.JSONObject
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.ByteArrayOutputStream
@@ -71,7 +72,10 @@ class TakeSelfie : AppCompatActivity() {
 
         // Initialise Firebase
         firebaseAuth = FirebaseAuth.getInstance()
-        //val currentUser = firebaseAuth!!.currentUser
+        val currentUser = firebaseAuth!!.currentUser
+
+        //clear subDir
+        subDir =""
 
         //click the button to invoke an intent to take a selfie
         btnTakeSelfie.setOnClickListener() {
@@ -109,10 +113,11 @@ class TakeSelfie : AppCompatActivity() {
                 //pass path message to API
                 //postPathByVolley(fullDir)
 
-                //clear subDir
-                subDir = ""
-            }
-        }
+            }else {
+
+                // Tell user to wait
+                Toast.makeText(this,"Please take selfie for skin, or check for your history analysis.",Toast.LENGTH_LONG).show()
+            }        }
     }
 
     //to create a file for the selfie
@@ -133,6 +138,25 @@ class TakeSelfie : AppCompatActivity() {
             subDir = FirebaseStorageManager().uploadImage(this, fileProvider)
             fullDir = "gs://acne-diagnosis-6a653.appspot.com/" + subDir
             Toast.makeText(this, "Selfie upload to Firebase", Toast.LENGTH_SHORT).show()
+
+            // add image into realtime database
+            // Write a message to the database
+            val database = FirebaseDatabase.getInstance()
+            val myRef = database.getReference("Users")
+
+            val user = FirebaseAuth.getInstance().currentUser
+            val uid = user?.uid
+
+            // Get column from the table
+            // get the user nd add the data
+            myRef.child(uid.toString()).get().addOnSuccessListener {
+                if (it.child("image").exists()) {
+                    myRef.child(uid.toString()).child("image").setValue(fullDir)
+                }else if (!it.child("image").exists()){
+                    myRef.child(uid.toString()).child("image").setValue(fullDir)
+                    //myRef.child(uid.toString()).child("result").setValue(SymptomEnum.AD)
+                }
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
