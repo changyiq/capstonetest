@@ -6,6 +6,8 @@
     <string name="facebook_app_id">583949306361746</string>
     <string name="fb_login_protocol_scheme">fb583949306361746</string>
     <string name="redo_analysis">Redo Analysis</string>
+    <string name="link1"><u></u></string>
+    <string name="link2"><u></u></string>
     <string name="feed1">Integer malesuada a lorem at ornare.
         In elementum est eu massa malesuada, a tempor ipsum placerat. Ut pretium diam est.
         Praesent a massa ultrices.</string>
