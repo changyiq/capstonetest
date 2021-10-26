@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
@@ -33,6 +34,10 @@ import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
+import android.annotation.SuppressLint
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.*
 
 
 private const val FILE_NAME = "selfie"
@@ -104,6 +109,8 @@ class TakeSelfie : AppCompatActivity() {
                 intent.putExtra(EXTRA_SUBDIRECTORY, subDir)
                 startActivity(intent)
 
+                handleSSLHandshake()
+
                 //upload image to API by Volley
                 postImageByVolley(takenImage)
 
@@ -162,10 +169,38 @@ class TakeSelfie : AppCompatActivity() {
         }
     }
 
+    /**
+     * Enables https connections
+     */
+    @SuppressLint("TrulyRandom")
+    fun handleSSLHandshake() {
+        try {
+            val trustAllCerts: Array<TrustManager> =
+                arrayOf<TrustManager>(object : X509TrustManager {
+                    val acceptedIssuers: Array<Any?>?
+                        get() = arrayOfNulls(0)
+
+                    override fun checkClientTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun checkServerTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> {
+                        TODO("Not yet implemented")
+                    }
+                })
+            val sc: SSLContext = SSLContext.getInstance("SSL")
+            sc.init(null, trustAllCerts, SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier(object : HostnameVerifier {
+                override fun verify(arg0: String?, arg1: SSLSession?): Boolean {
+                    return true
+                }
+            })
+        } catch (ignored: java.lang.Exception) {
+        }
+    }
     fun postPathByVolley(fullDirectory: String) {
 
-        //val url1: String = "http://localhost:44374/api/Image"
-        val url1: String = "https://reqres.in/api/dir"
+        val url1: String = "https://10.0.2.2:5001/api/Image"
+        //val url1: String = "https://reqres.in/api/dir"
 
         // Post parameters, Form fields and values
         val params = HashMap<String, String>()
@@ -237,7 +272,7 @@ class TakeSelfie : AppCompatActivity() {
 
     fun postImageByVolley(image: Bitmap) {
 
-        val url2: String = "http://localhost:44374/api/Image"
+        val url2: String = "https://10.0.2.2:5001/api/Image"
 
         //converting image to base64 string
         val baos = ByteArrayOutputStream()
@@ -248,21 +283,38 @@ class TakeSelfie : AppCompatActivity() {
         //sending image to server
         val request2: StringRequest = object : StringRequest(
             Method.POST, url2,
-            Response.Listener { s ->
-                if (s == "true") {
-                    Toast.makeText(this@TakeSelfie, "Uploaded Image Successful", Toast.LENGTH_LONG)
-                        .show()
-                } else {
-                    Toast.makeText(this@TakeSelfie, "Some error occurred!", Toast.LENGTH_LONG)
-                        .show()
+//            Response.Listener { s ->
+//                if (s == "true") {
+//                    Toast.makeText(this@TakeSelfie, "Uploaded Image Successful", Toast.LENGTH_LONG)
+//                        .show()
+//                } else {
+//                    Toast.makeText(this@TakeSelfie, "Some error occurred!", Toast.LENGTH_LONG)
+//                        .show()
+//                }
+//            },
+              Response.Listener { response ->
+                // Process the json
+                try {
+                    //textView.text = "Response: $response"
+                    Toast.makeText(
+                        this,
+                        "Response: \nPath are posted to API. \n$response",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } catch (e: Exception) {
+                    //textView.text = "Exception: $e"
+                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
                 }
-            },
-            Response.ErrorListener { volleyError ->
+
+            },Response.ErrorListener { volleyError ->
                 Toast.makeText(
                     this@TakeSelfie,
                     "Some error occurred -> $volleyError",
                     Toast.LENGTH_LONG
                 ).show()
+                Log.e("Volley Error-----------", "${volleyError.cause}")
+                Log.e("Volley Error-----------", "${volleyError.message}")
+
             }) {
             //adding parameters to send
             @Throws(AuthFailureError::class)
