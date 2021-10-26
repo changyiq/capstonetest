@@ -23,6 +23,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    android{
+        useLibrary  'org.apache.http.legacy'
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,6 +42,8 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+
 }
 
 dependencies {
@@ -60,4 +71,9 @@ dependencies {
     // upload file to rest api
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.6.1'
+
+    implementation group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+    implementation('org.apache.httpcomponents:httpmime:4.3') {
+        exclude module: "httpclient"
+    }
 }

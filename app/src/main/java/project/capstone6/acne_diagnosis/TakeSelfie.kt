@@ -1,6 +1,5 @@
 package project.capstone6.acne_diagnosis
 
-import android.R.attr
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,10 +17,12 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import com.android.volley.AuthFailureError
 import com.android.volley.DefaultRetryPolicy
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.StringRequest
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -31,16 +32,6 @@ import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
-import com.android.volley.AuthFailureError
-
-import com.android.volley.VolleyError
-
-import com.android.volley.toolbox.StringRequest
-
-import android.R.attr.bitmap
-
-
-
 
 
 private const val FILE_NAME = "selfie"
@@ -54,7 +45,7 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private lateinit var photoFile: File
     private lateinit var fileProvider: Uri
-    private final lateinit var takenImage: Bitmap
+    private lateinit var takenImage: Bitmap
 
     private lateinit var subDir: String
     private lateinit var fullDir: String
@@ -109,11 +100,14 @@ class TakeSelfie : AppCompatActivity() {
                 intent.putExtra(EXTRA_SUBDIRECTORY, subDir)
                 startActivity(intent)
 
-                //pass path message to API
-                postPathByVolley(fullDir)
-
-                //upload image to API
+                //upload image to API by Volley
                 postImageByVolley(takenImage)
+
+                //upload image to API by HttpURLConnection
+                //postImageByHttpURLConnection(takenImage)
+
+                //pass path message to API
+                //postPathByVolley(fullDir)
 
                 //clear subDir
                 subDir = ""
@@ -191,6 +185,32 @@ class TakeSelfie : AppCompatActivity() {
 
     }
 
+    /*
+    fun postImageByHttpURLConnection(bitmap: Bitmap) {
+        try {
+            val url = URL("http://localhost:44374/api/Image")
+            val c: HttpURLConnection = url.openConnection() as HttpURLConnection
+            c.setDoInput(true)
+            c.setRequestMethod("POST")
+            c.setDoOutput(true)
+            c.connect()
+
+            val output: OutputStream = c.getOutputStream()
+            bitmap.compress(CompressFormat.JPEG, 50, output)
+            output.close()
+
+            val result = Scanner(c.getInputStream())
+            val response: String = result.nextLine()
+            Log.e("ImageUploader", "Error uploading image: $response")
+
+            result.close()
+        } catch (e: IOException) {
+            Log.e("ImageUploader", "Error uploading image", e)
+        }
+    }
+    */
+
+
     fun postImageByVolley(image: Bitmap) {
 
         val url2: String = "http://localhost:44374/api/Image"
@@ -232,7 +252,6 @@ class TakeSelfie : AppCompatActivity() {
         // Add the volley post request to the request queue
         VolleySingleton.getInstance(this).addToRequestQueue(request2)
     }
-
 
     //process menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
