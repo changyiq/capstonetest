@@ -84,7 +84,7 @@
         android:layout_width="319dp"
         android:layout_height="59dp"
         android:layout_marginTop="18dp"
-        android:text="Acne and Rosacea photos"
+        android:text=".."
         android:textAlignment="center"
         android:textSize="14sp"
         android:textStyle="bold"

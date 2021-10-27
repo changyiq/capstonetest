@@ -3,6 +3,7 @@ package project.capstone6.acne_diagnosis
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -24,7 +25,7 @@ class Result : AppCompatActivity() {
     private lateinit var binding3: ActivityResultBinding
     private lateinit var btnAgain: Button
     private lateinit var btnExit: Button
-    private lateinit var tvResult: TextView
+    private lateinit var skinProblem: TextView
     private lateinit var hybirdLink1: TextView
     private lateinit var hybirdLink2: TextView
     private lateinit var memeImageView: ImageView
@@ -34,8 +35,9 @@ class Result : AppCompatActivity() {
     private lateinit var picPath: String
     private lateinit var symptom: String
     private lateinit var linkList: List<String>
+    private lateinit var receivedResult: String
 
-    var receivedResult: String = ""
+    //var receivedResult: String = ""
 
     var firebaseAuth: FirebaseAuth? = null
 
@@ -50,11 +52,16 @@ class Result : AppCompatActivity() {
         btnExit = binding3.btnExit
         hybirdLink1 = binding3.medicalRtv1
         hybirdLink2 = binding3.medicalRtv2
-        //tvResult = binding3.tvResult
+        symptom = ""
+        linkList = listOf()
+        skinProblem = binding3.skinProblem
 
         //Get fulldirectory
         val intent = getIntent()
         picPath = intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY).toString()
+        receivedResult = intent.getStringExtra("RESPONSE").toString()
+        Log.e("picPath in result---------------", picPath)
+        Log.w("Result in result---------------", receivedResult)
 
         btnAgain.setOnClickListener {
 
@@ -93,24 +100,28 @@ class Result : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user?.uid
 
-//        // code to get the response from api and filter the keyword of the symptom and provide user
-//        // medical resources
-//        receivedResult = "Acne and Rosacea photos"
-//        for(sym in SymptomEnum.values()){
-//            if (receivedResult.contains(sym.symptom)){
-//                symptom = sym.symptom
-//            }
-//        }
+        skinProblem.text = "Object reference not set to an instance of an object."
+        // code to get the response from api and filter the keyword of the symptom and provide user
+        // medical resources
+        for(sym in SymptomEnum.values()){
+            if (receivedResult.contains(sym.symptom)){
+                symptom = sym.symptom
+            }else{
+                Toast.makeText(this, "Cannot be diagnosed", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         //Get column from the table
         // if exists, then fetch the data and update the UI
         myRef.child(uid.toString()).get().addOnSuccessListener {
             if (it.exists()) {
                 if (it.child("image").exists()) {
-                    symptom = SymptomEnum.AR.symptom
+                   //symptom = SymptomEnum.AR.symptom
                     myRef.child(uid.toString()).child("result").setValue(symptom)
-                    hybirdLink1.text = getWebsite(symptom)[0]
-                    hybirdLink2.text = getWebsite(symptom)[1]
+                    if (getWebsite(symptom).isNotEmpty()) {
+                        hybirdLink1.text = getWebsite(symptom)[0]
+                        hybirdLink2.text = getWebsite(symptom)[1]
+                    }
 
                     // pass the url info based on the clicked link
                     val intent = Intent(this, Website::class.java)

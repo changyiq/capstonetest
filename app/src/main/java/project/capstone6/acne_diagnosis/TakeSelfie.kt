@@ -55,7 +55,7 @@ class TakeSelfie : AppCompatActivity() {
 
     private lateinit var subDir: String
     private lateinit var fullDir: String
-
+    private lateinit var responseFromApi: String
 
     var firebaseAuth: FirebaseAuth? = null
 
@@ -63,6 +63,7 @@ class TakeSelfie : AppCompatActivity() {
         const val REQUEST_FROM_CAMERA = 1001
         const val EXTRA_FULLDIRECTORY = "SavedFulldirectory"
         const val EXTRA_SUBDIRECTORY = "SavedSubdirectory"
+        const val RESPONSE_BY_API = "response"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +75,8 @@ class TakeSelfie : AppCompatActivity() {
         btnTakeSelfie = binding2.btnTakeSelfie
         btnDiagnosis = binding2.btnDiagnosis
         imageView = binding2.imageView
+
+        responseFromApi = ""
 
         // Initialise Firebase
         firebaseAuth = FirebaseAuth.getInstance()
@@ -100,19 +103,21 @@ class TakeSelfie : AppCompatActivity() {
         btnDiagnosis.setOnClickListener {
 
             if (subDir != "" && subDir != null) {
+
+                handleSSLHandshake()
+
                 // call intent to go to result page
                 val intent = Intent(this, Result::class.java)
+
+                //upload image to API by Volley
+                postImageByVolley(takenImage)
+                Log.w("Response in takeSelfie btnClick-----------", responseFromApi)
+                intent.putExtra(RESPONSE_BY_API, responseFromApi)
 
                 //pass fulldirectory information to Result page
                 //Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_FULLDIRECTORY, fullDir)
                 intent.putExtra(EXTRA_SUBDIRECTORY, subDir)
-                startActivity(intent)
-
-                handleSSLHandshake()
-
-                //upload image to API by Volley
-                postImageByVolley(takenImage)
 
                 //upload image to API by HttpURLConnection
                 //postImageByHttpURLConnection(takenImage)
@@ -120,6 +125,7 @@ class TakeSelfie : AppCompatActivity() {
                 //pass path message to API
                 //postPathByVolley(fullDir)
 
+                startActivity(intent)
             }else {
 
                 // Tell user to wait
@@ -197,52 +203,52 @@ class TakeSelfie : AppCompatActivity() {
         } catch (ignored: java.lang.Exception) {
         }
     }
-    fun postPathByVolley(fullDirectory: String) {
-
-        val url1: String = "https://10.0.2.2:5001/api/Image"
-        //val url1: String = "https://reqres.in/api/dir"
-
-        // Post parameters, Form fields and values
-        val params = HashMap<String, String>()
-        params["fullDirectory"] = fullDirectory
-        val jsonObject = JSONObject(params as Map<*, *>)
-
-        // Volley post request with parameters
-        val request1 = JsonObjectRequest(
-            Request.Method.POST, url1, jsonObject,
-            Response.Listener { response ->
-                // Process the json
-                try {
-                    //textView.text = "Response: $response"
-                    Toast.makeText(
-                        this,
-                        "Response: \nPath are posted to API. \n$response",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } catch (e: Exception) {
-                    //textView.text = "Exception: $e"
-                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
-                }
-
-            }, Response.ErrorListener {
-                // Error in request
-                //textView.text = "Volley error: $it"
-                Toast.makeText(this, "Volley error: $it", Toast.LENGTH_LONG).show()
-            })
-
-
-        // Volley request policy, only one time request to avoid duplicate transaction
-        request1.retryPolicy = DefaultRetryPolicy(
-            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-            // 0 means no retry
-            0, // DefaultRetryPolicy.DEFAULT_MAX_RETRIES = 2
-            1f // DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        )
-
-        // Add the volley post request to the request queue
-        VolleySingleton.getInstance(this).addToRequestQueue(request1)
-
-    }
+//    fun postPathByVolley(fullDirectory: String) {
+//
+//        val url1: String = "https://10.0.2.2:5001/api/Image"
+//        //val url1: String = "https://reqres.in/api/dir"
+//
+//        // Post parameters, Form fields and values
+//        val params = HashMap<String, String>()
+//        params["fullDirectory"] = fullDirectory
+//        val jsonObject = JSONObject(params as Map<*, *>)
+//
+//        // Volley post request with parameters
+//        val request1 = JsonObjectRequest(
+//            Request.Method.POST, url1, jsonObject,
+//            Response.Listener { response ->
+//                // Process the json
+//                try {
+//                    //textView.text = "Response: $response"
+//                    Toast.makeText(
+//                        this,
+//                        "Response: \nPath are posted to API. \n$response",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                } catch (e: Exception) {
+//                    //textView.text = "Exception: $e"
+//                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
+//                }
+//
+//            }, Response.ErrorListener {
+//                // Error in request
+//                //textView.text = "Volley error: $it"
+//                Toast.makeText(this, "Volley error: $it", Toast.LENGTH_LONG).show()
+//            })
+//
+//
+//        // Volley request policy, only one time request to avoid duplicate transaction
+//        request1.retryPolicy = DefaultRetryPolicy(
+//            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
+//            // 0 means no retry
+//            0, // DefaultRetryPolicy.DEFAULT_MAX_RETRIES = 2
+//            1f // DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+//        )
+//
+//        // Add the volley post request to the request queue
+//        VolleySingleton.getInstance(this).addToRequestQueue(request1)
+//
+//    }
 
     /*
     fun postImageByHttpURLConnection(bitmap: Bitmap) {
@@ -296,6 +302,8 @@ class TakeSelfie : AppCompatActivity() {
                 // Process the json
                 try {
                     //textView.text = "Response: $response"
+                    responseFromApi = response.toString()
+                    Log.e("Response in takeSelfie-----------", responseFromApi)
                     Toast.makeText(
                         this,
                         "Response: \nPath are posted to API. \n$response",
@@ -324,7 +332,7 @@ class TakeSelfie : AppCompatActivity() {
                 return parameters
             }
         }
-
+        Log.w("Response in takeSelfie outside res-----------", responseFromApi)
         // Add the volley post request to the request queue
         VolleySingleton.getInstance(this).addToRequestQueue(request2)
     }

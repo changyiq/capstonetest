@@ -96,7 +96,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // check user log in/out status, if the user is logged in, directly go to Result activity
         if (firebaseAuth.getCurrentUser() != null) {
-            startActivity(new Intent(getApplicationContext(), Result.class));
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         }
         // -----------------------------------Google Authentication---------------------------------
@@ -164,7 +164,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser currentUser = firebaseAuth.getCurrentUser();
                 if( currentUser != null){
-                    startActivity(new Intent(getApplicationContext(), Result.class));
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
                 }
             }
