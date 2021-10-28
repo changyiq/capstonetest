@@ -1,24 +1,28 @@
 package project.capstone6.acne_diagnosis
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.*
-import com.facebook.AccessTokenTracker
+import com.android.volley.AuthFailureError
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
-import com.google.firebase.auth.FirebaseAuth.getInstance
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import project.capstone6.acne_diagnosis.databinding.ActivityResultBinding
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import javax.net.ssl.*
 
 class Result : AppCompatActivity() {
 
@@ -35,9 +39,8 @@ class Result : AppCompatActivity() {
     private lateinit var picPath: String
     private lateinit var symptom: String
     private lateinit var linkList: List<String>
-    private lateinit var receivedResult: String
-
-    //var receivedResult: String = ""
+    private lateinit var receivedImage: ByteArray
+    private lateinit var resultFromResponse: String
 
     var firebaseAuth: FirebaseAuth? = null
 
@@ -55,20 +58,18 @@ class Result : AppCompatActivity() {
         symptom = ""
         linkList = listOf()
         skinProblem = binding3.skinProblem
+        resultFromResponse = ""
 
         //Get fulldirectory
         val intent = getIntent()
         picPath = intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY).toString()
-        receivedResult = intent.getStringExtra("RESPONSE").toString()
+        receivedImage = intent.getByteArrayExtra("ImageFile")!!
         Log.e("picPath in result---------------", picPath)
-        Log.w("Result in result---------------", receivedResult)
 
         btnAgain.setOnClickListener {
-
             val intent3 = Intent(this, TakeSelfie::class.java)
             startActivity(intent3)
         }
-
 
         // Initialise Firebase
         firebaseAuth = FirebaseAuth.getInstance()
@@ -78,19 +79,21 @@ class Result : AppCompatActivity() {
             logOut()
         }
 
+        getResultFromVolley(receivedImage)
         getUser()
         loadResult()
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getUser(){
         val user = FirebaseAuth.getInstance().currentUser
         val email = user?.email.toString()
-        val uid = user?.tenantId
 
         binding3.tv2.text = "Hi $email"
     }
 
+    @SuppressLint("SetTextI18n")
     private fun loadResult() {
         // Write a message to the database
         val database = FirebaseDatabase.getInstance()
@@ -100,14 +103,14 @@ class Result : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user?.uid
 
-        skinProblem.text = "Object reference not set to an instance of an object."
+        resultFromResponse = skinProblem.text.toString()
         // code to get the response from api and filter the keyword of the symptom and provide user
         // medical resources
         for(sym in SymptomEnum.values()){
-            if (receivedResult.contains(sym.symptom)){
+            if (resultFromResponse.contains(sym.symptom)){
                 symptom = sym.symptom
             }else{
-                Toast.makeText(this, "Cannot be diagnosed", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Cannot be diagnosed", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -121,20 +124,25 @@ class Result : AppCompatActivity() {
                     if (getWebsite(symptom).isNotEmpty()) {
                         hybirdLink1.text = getWebsite(symptom)[0]
                         hybirdLink2.text = getWebsite(symptom)[1]
+                        // pass the url info based on the clicked link
+                        val intent = Intent(this, Website::class.java)
+                        hybirdLink1.setOnClickListener() {
+                            intent.putExtra("URL", hybirdLink1.text.toString())
+                            startActivity(intent)
+                        }
+                        hybirdLink2.setOnClickListener() {
+                            intent.putExtra("URL", hybirdLink2.text.toString())
+                            startActivity(intent)
+                        }
+                    } else{
+                        hybirdLink1.isClickable = false
+                        hybirdLink2.isClickable = false
+                        hybirdLink1.text = "..."
+                        hybirdLink2.text = "..."
                     }
 
-                    // pass the url info based on the clicked link
-                    val intent = Intent(this, Website::class.java)
-                    hybirdLink1.setOnClickListener(){
-                        intent.putExtra("URL", hybirdLink1.text.toString())
-                        startActivity(intent)
-                    }
-                    hybirdLink2.setOnClickListener(){
-                        intent.putExtra("URL", hybirdLink2.text.toString())
-                        startActivity(intent)
-                    }
-                    true
                 }else {
+                    skinProblem.text = "You have not made any analysis"
                     Toast.makeText(this, "You have not made any analysis", Toast.LENGTH_SHORT).show()
                 }
             } else {
@@ -171,6 +179,79 @@ class Result : AppCompatActivity() {
             SymptomEnum.WM.symptom -> linkList = listOf(MedicalResourcesEnum.WM.website)
         }
         return  linkList
+    }
+
+    /**
+     * Enables https connections
+     */
+    @SuppressLint("TrulyRandom")
+    fun handleSSLHandshake() {
+        try {
+            val trustAllCerts: Array<TrustManager> =
+                arrayOf<TrustManager>(object : X509TrustManager {
+                    val acceptedIssuers: Array<Any?>?
+                        get() = arrayOfNulls(0)
+
+                    override fun checkClientTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun checkServerTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> {
+                        TODO("Not yet implemented")
+                    }
+                })
+            val sc: SSLContext = SSLContext.getInstance("SSL")
+            sc.init(null, trustAllCerts, SecureRandom())
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+            HttpsURLConnection.setDefaultHostnameVerifier(object : HostnameVerifier {
+                override fun verify(arg0: String?, arg1: SSLSession?): Boolean {
+                    return true
+                }
+            })
+        } catch (ignored: java.lang.Exception) {
+        }
+    }
+
+    fun getResultFromVolley(image: ByteArray) {
+        val url2: String = "https://10.0.2.2:5001/api/Image"
+
+        val imageString = Base64.encodeToString(image, Base64.DEFAULT)
+
+        //sending image to server
+        val request2: StringRequest = object : StringRequest(
+            Method.POST, url2,
+            Response.Listener { response ->
+                // Process the json
+                try {
+                    skinProblem.text = response.toString()
+                    Toast.makeText(
+                        this,
+                        "Response: \n$response",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
+                }
+
+            },Response.ErrorListener { volleyError ->
+                Toast.makeText(
+                    this,
+                    "Some error occurred -> $volleyError",
+                    Toast.LENGTH_LONG
+                ).show()
+                Log.e("Volley Error-----------", "${volleyError.cause}")
+                Log.e("Volley Error-----------", "${volleyError.message}")
+
+            }) {
+            //adding parameters to send
+            @Throws(AuthFailureError::class)
+            override fun getParams(): Map<String, String>? {
+                val parameters: MutableMap<String, String> = HashMap()
+                parameters["image"] = imageString
+                return parameters
+            }
+        }
+
+        // Add the volley post request to the request queue
+        VolleySingleton.getInstance(this).addToRequestQueue(request2)
     }
 
     fun logOut() {

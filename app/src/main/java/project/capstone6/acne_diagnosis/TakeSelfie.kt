@@ -1,5 +1,6 @@
 package project.capstone6.acne_diagnosis
 
+import android.R.attr
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -35,10 +36,14 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 import android.annotation.SuppressLint
+import java.io.DataInput
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
+import project.capstone6.acne_diagnosis.VolleyMultipartRequest.DataPart
+import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.HttpHeaderParser
 
 private const val FILE_NAME = "selfie"
 
@@ -113,6 +118,12 @@ class TakeSelfie : AppCompatActivity() {
                 postImageByVolley(takenImage)
                 Log.w("Response in takeSelfie btnClick-----------", responseFromApi)
                 intent.putExtra(RESPONSE_BY_API, responseFromApi)
+
+                // pass image
+                val baos = ByteArrayOutputStream()
+                takenImage.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                val imageBytes = baos.toByteArray()
+                intent.putExtra("ImageFile", imageBytes)
 
                 //pass fulldirectory information to Result page
                 //Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
@@ -203,52 +214,6 @@ class TakeSelfie : AppCompatActivity() {
         } catch (ignored: java.lang.Exception) {
         }
     }
-//    fun postPathByVolley(fullDirectory: String) {
-//
-//        val url1: String = "https://10.0.2.2:5001/api/Image"
-//        //val url1: String = "https://reqres.in/api/dir"
-//
-//        // Post parameters, Form fields and values
-//        val params = HashMap<String, String>()
-//        params["fullDirectory"] = fullDirectory
-//        val jsonObject = JSONObject(params as Map<*, *>)
-//
-//        // Volley post request with parameters
-//        val request1 = JsonObjectRequest(
-//            Request.Method.POST, url1, jsonObject,
-//            Response.Listener { response ->
-//                // Process the json
-//                try {
-//                    //textView.text = "Response: $response"
-//                    Toast.makeText(
-//                        this,
-//                        "Response: \nPath are posted to API. \n$response",
-//                        Toast.LENGTH_LONG
-//                    ).show()
-//                } catch (e: Exception) {
-//                    //textView.text = "Exception: $e"
-//                    Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
-//                }
-//
-//            }, Response.ErrorListener {
-//                // Error in request
-//                //textView.text = "Volley error: $it"
-//                Toast.makeText(this, "Volley error: $it", Toast.LENGTH_LONG).show()
-//            })
-//
-//
-//        // Volley request policy, only one time request to avoid duplicate transaction
-//        request1.retryPolicy = DefaultRetryPolicy(
-//            DefaultRetryPolicy.DEFAULT_TIMEOUT_MS,
-//            // 0 means no retry
-//            0, // DefaultRetryPolicy.DEFAULT_MAX_RETRIES = 2
-//            1f // DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-//        )
-//
-//        // Add the volley post request to the request queue
-//        VolleySingleton.getInstance(this).addToRequestQueue(request1)
-//
-//    }
 
     /*
     fun postImageByHttpURLConnection(bitmap: Bitmap) {
@@ -276,18 +241,18 @@ class TakeSelfie : AppCompatActivity() {
     */
 
 
-    fun postImageByVolley(image: Bitmap) {
 
+    fun postImageByVolley(image: Bitmap) {
         val url2: String = "https://10.0.2.2:5001/api/Image"
 
-        //converting image to base64 string
+        //converting image to bytes/base64 string
         val baos = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val imageBytes = baos.toByteArray()
-        val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
+        val imageBytes = baos.toByteArray() // get data from drawabale
+        //val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
 
         //sending image to server
-        val request2: StringRequest = object : StringRequest(
+        val request2: VolleyMultipartRequest = object : VolleyMultipartRequest(
             Method.POST, url2,
 //            Response.Listener { s ->
 //                if (s == "true") {
@@ -303,10 +268,13 @@ class TakeSelfie : AppCompatActivity() {
                 try {
                     //textView.text = "Response: $response"
                     responseFromApi = response.toString()
+//                    val json =
+//                        String(response.data, HttpHeaderParser.parseCharset(response.headers))
+
                     Log.e("Response in takeSelfie-----------", responseFromApi)
                     Toast.makeText(
                         this,
-                        "Response: \nPath are posted to API. \n$response",
+                        "Response: \nPath are posted to API. \n${responseFromApi}\n${response.data}\n${response.headers}",
                         Toast.LENGTH_LONG
                     ).show()
                 } catch (e: Exception) {
@@ -325,16 +293,28 @@ class TakeSelfie : AppCompatActivity() {
 
             }) {
             //adding parameters to send
+//            @Throws(AuthFailureError::class)
+//            override fun getParams(): Map<String, String>? {
+//                val parameters: MutableMap<String, String> = HashMap()
+//                parameters["imageFile"] = imageString
+//                return parameters
+//            }
+            protected open fun getByteData(): MutableMap<String, DataPart> {
+                val params: MutableMap<String, DataPart> = HashMap()
+                val imageName = System.currentTimeMillis()
+                params["image"] = DataPart("$imageName.png", imageBytes)
+                return params
+            }
+
             @Throws(AuthFailureError::class)
-            override fun getParams(): Map<String, String>? {
-                val parameters: MutableMap<String, String> = HashMap()
-                parameters["image"] = imageString
-                return parameters
+            override fun getHeaders(): Map<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Content-Type"] = "text/plain; charset=utf-8"
+                return headers
             }
         }
-        Log.w("Response in takeSelfie outside res-----------", responseFromApi)
         // Add the volley post request to the request queue
-        VolleySingleton.getInstance(this).addToRequestQueue(request2)
+        Volley.newRequestQueue(this).add(request2)
     }
 
     //process menu
