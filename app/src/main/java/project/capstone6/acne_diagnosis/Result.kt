@@ -26,6 +26,7 @@ import javax.net.ssl.*
 
 class Result : AppCompatActivity() {
 
+    // properties declaration
     private lateinit var binding3: ActivityResultBinding
     private lateinit var btnAgain: Button
     private lateinit var btnExit: Button
@@ -50,7 +51,7 @@ class Result : AppCompatActivity() {
         binding3 = ActivityResultBinding.inflate(LayoutInflater.from(this))
         setContentView(binding3.root)
 
-
+        // initializing
         btnAgain = binding3.btnAgain
         btnExit = binding3.btnExit
         hybirdLink1 = binding3.medicalRtv1
@@ -60,7 +61,7 @@ class Result : AppCompatActivity() {
         skinProblem = binding3.skinProblem
         resultFromResponse = ""
 
-        //Get fulldirectory
+        //Get intent obj
         val intent = getIntent()
         picPath = intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY).toString()
         receivedImage = intent.getByteArrayExtra("ImageFile")!!
@@ -79,6 +80,7 @@ class Result : AppCompatActivity() {
             logOut()
         }
 
+        // pass image to analyze
         getResultFromVolley(receivedImage)
         getUser()
         loadResult()
@@ -103,7 +105,9 @@ class Result : AppCompatActivity() {
         val user = FirebaseAuth.getInstance().currentUser
         val uid = user?.uid
 
+        // Retrieving result value from textView which is from api
         resultFromResponse = skinProblem.text.toString()
+
         // code to get the response from api and filter the keyword of the symptom and provide user
         // medical resources
         for(sym in SymptomEnum.values()){
@@ -135,6 +139,7 @@ class Result : AppCompatActivity() {
                             startActivity(intent)
                         }
                     } else{
+                        // if no symptom found, then no medical resources provided, set it to ...
                         hybirdLink1.isClickable = false
                         hybirdLink2.isClickable = false
                         hybirdLink1.text = "..."
@@ -210,17 +215,20 @@ class Result : AppCompatActivity() {
         }
     }
 
+    // sending request to get the result response from api
     fun getResultFromVolley(image: ByteArray) {
         val url2: String = "https://10.0.2.2:5001/api/Image"
 
+        // converting to image encoded string
         val imageString = Base64.encodeToString(image, Base64.DEFAULT)
 
-        //sending image to server
+        //fetching image result from server
         val request2: StringRequest = object : StringRequest(
             Method.POST, url2,
             Response.Listener { response ->
                 // Process the json
                 try {
+                    // pass value on UI textView from received result
                     skinProblem.text = response.toString()
                     Toast.makeText(
                         this,
@@ -255,7 +263,6 @@ class Result : AppCompatActivity() {
     }
 
     fun logOut() {
-
         startActivity(Intent(applicationContext, LoginActivity::class.java))
 
         // get google sign in status

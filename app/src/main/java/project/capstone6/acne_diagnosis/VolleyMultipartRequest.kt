@@ -11,11 +11,7 @@ import com.android.volley.toolbox.HttpHeaderParser
 import java.lang.Exception
 import com.android.volley.VolleyError
 import java.io.*
-import java.lang.RuntimeException
 
-//class VolleyMultipartRequest{
-//
-//}
 open class VolleyMultipartRequest(
     method: Int, url: String?,
     private val mListener: Response.Listener<NetworkResponse>,
@@ -39,12 +35,6 @@ open class VolleyMultipartRequest(
         val bos = ByteArrayOutputStream()
         val dos = DataOutputStream(bos)
         try {
-//            // populate text payload
-//            val params = params
-//            if (params != null && params.size > 0) {
-//                textParse(dos, params, paramsEncoding)
-//            }
-
             // populate data byte payload
             val data = byteData
             if (data != null && data.size > 0) {
@@ -90,29 +80,6 @@ open class VolleyMultipartRequest(
         mErrorListener!!.onErrorResponse(error)
     }
 
-//    /**
-//     * Parse string map into data output stream by key and value.
-//     *
-//     * @param dataOutputStream data output stream handle string parsing
-//     * @param params           string inputs collection
-//     * @param encoding         encode the inputs, default UTF-8
-//     * @throws IOException
-//     */
-//    @Throws(IOException::class)
-//    private fun textParse(
-//        dataOutputStream: DataOutputStream,
-//        params: Map<String, String>,
-//        encoding: String
-//    ) {
-//        try {
-//            for (entry: Map.Entry<String, String> in params.entries) {
-//                buildTextPart(dataOutputStream, entry.key, entry.value)
-//            }
-//        } catch (uee: UnsupportedEncodingException) {
-//            throw RuntimeException("Encoding not supported: $encoding", uee)
-//        }
-//    }
-
     /**
      * Parse data into data output stream.
      *
@@ -126,26 +93,6 @@ open class VolleyMultipartRequest(
             buildDataPart(dataOutputStream, entry.value, entry.key)
         }
     }
-
-//    /**
-//     * Write string data into header and data output stream.
-//     *
-//     * @param dataOutputStream data output stream handle string parsing
-//     * @param parameterName    name of input
-//     * @param parameterValue   value of input
-//     * @throws IOException
-//     */
-//    @Throws(IOException::class)
-//    private fun buildTextPart(
-//        dataOutputStream: DataOutputStream,
-//        parameterName: String,
-//        parameterValue: String
-//    ) {
-//        dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd)
-//        dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"$parameterName\"$lineEnd")
-//        dataOutputStream.writeBytes(lineEnd)
-//        dataOutputStream.writeBytes(parameterValue + lineEnd)
-//    }
 
     /**
      * Write data file into header and data output stream.

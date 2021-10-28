@@ -1,6 +1,5 @@
 package project.capstone6.acne_diagnosis
 
-import android.R.attr
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
@@ -9,7 +8,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -20,30 +18,22 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.android.volley.AuthFailureError
-import com.android.volley.DefaultRetryPolicy
-import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import org.json.JSONObject
 import project.capstone6.acne_diagnosis.databinding.ActivityTakeSelfieBinding
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 import android.annotation.SuppressLint
-import java.io.DataInput
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
-import project.capstone6.acne_diagnosis.VolleyMultipartRequest.DataPart
 import com.android.volley.toolbox.Volley
-import com.android.volley.toolbox.HttpHeaderParser
 
 private const val FILE_NAME = "selfie"
 
@@ -64,6 +54,7 @@ class TakeSelfie : AppCompatActivity() {
 
     var firebaseAuth: FirebaseAuth? = null
 
+    // embedded obj to pass around
     companion object {
         const val REQUEST_FROM_CAMERA = 1001
         const val EXTRA_FULLDIRECTORY = "SavedFulldirectory"
@@ -126,15 +117,8 @@ class TakeSelfie : AppCompatActivity() {
                 intent.putExtra("ImageFile", imageBytes)
 
                 //pass fulldirectory information to Result page
-                //Toast.makeText(this," Save Subdir as " + subDir,Toast.LENGTH_LONG).show()
                 intent.putExtra(EXTRA_FULLDIRECTORY, fullDir)
                 intent.putExtra(EXTRA_SUBDIRECTORY, subDir)
-
-                //upload image to API by HttpURLConnection
-                //postImageByHttpURLConnection(takenImage)
-
-                //pass path message to API
-                //postPathByVolley(fullDir)
 
                 startActivity(intent)
             }else {
@@ -215,33 +199,7 @@ class TakeSelfie : AppCompatActivity() {
         }
     }
 
-    /*
-    fun postImageByHttpURLConnection(bitmap: Bitmap) {
-        try {
-            val url = URL("http://localhost:44374/api/Image")
-            val c: HttpURLConnection = url.openConnection() as HttpURLConnection
-            c.setDoInput(true)
-            c.setRequestMethod("POST")
-            c.setDoOutput(true)
-            c.connect()
-
-            val output: OutputStream = c.getOutputStream()
-            bitmap.compress(CompressFormat.JPEG, 50, output)
-            output.close()
-
-            val result = Scanner(c.getInputStream())
-            val response: String = result.nextLine()
-            Log.e("ImageUploader", "Error uploading image: $response")
-
-            result.close()
-        } catch (e: IOException) {
-            Log.e("ImageUploader", "Error uploading image", e)
-        }
-    }
-    */
-
-
-
+    // send http post request to communicate with api and get the response with its header
     fun postImageByVolley(image: Bitmap) {
         val url2: String = "https://10.0.2.2:5001/api/Image"
 
@@ -249,28 +207,17 @@ class TakeSelfie : AppCompatActivity() {
         val baos = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val imageBytes = baos.toByteArray() // get data from drawabale
-        //val imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT)
 
         //sending image to server
         val request2: VolleyMultipartRequest = object : VolleyMultipartRequest(
             Method.POST, url2,
-//            Response.Listener { s ->
-//                if (s == "true") {
-//                    Toast.makeText(this@TakeSelfie, "Uploaded Image Successful", Toast.LENGTH_LONG)
-//                        .show()
-//                } else {
-//                    Toast.makeText(this@TakeSelfie, "Some error occurred!", Toast.LENGTH_LONG)
-//                        .show()
-//                }
-//            },
               Response.Listener { response ->
                 // Process the json
                 try {
                     //textView.text = "Response: $response"
                     responseFromApi = response.toString()
-//                    val json =
-//                        String(response.data, HttpHeaderParser.parseCharset(response.headers))
 
+                    // debugging
                     Log.e("Response in takeSelfie-----------", responseFromApi)
                     Toast.makeText(
                         this,
@@ -278,7 +225,6 @@ class TakeSelfie : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                 } catch (e: Exception) {
-                    //textView.text = "Exception: $e"
                     Toast.makeText(this, "Exception: $e", Toast.LENGTH_LONG).show()
                 }
 
@@ -288,17 +234,13 @@ class TakeSelfie : AppCompatActivity() {
                     "Some error occurred -> $volleyError",
                     Toast.LENGTH_LONG
                 ).show()
+                // debugging
                 Log.e("Volley Error-----------", "${volleyError.cause}")
                 Log.e("Volley Error-----------", "${volleyError.message}")
 
             }) {
-            //adding parameters to send
-//            @Throws(AuthFailureError::class)
-//            override fun getParams(): Map<String, String>? {
-//                val parameters: MutableMap<String, String> = HashMap()
-//                parameters["imageFile"] = imageString
-//                return parameters
-//            }
+
+            // setup parameters
             protected open fun getByteData(): MutableMap<String, DataPart> {
                 val params: MutableMap<String, DataPart> = HashMap()
                 val imageName = System.currentTimeMillis()
@@ -306,6 +248,7 @@ class TakeSelfie : AppCompatActivity() {
                 return params
             }
 
+            // get the header data
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val headers = HashMap<String, String>()
@@ -319,7 +262,6 @@ class TakeSelfie : AppCompatActivity() {
 
     //process menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
         val inflater = menuInflater
         inflater.inflate(R.menu.takeselfiemenu, menu)
         return true
