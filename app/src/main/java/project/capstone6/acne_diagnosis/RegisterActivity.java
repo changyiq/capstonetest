@@ -204,12 +204,13 @@ public class RegisterActivity extends AppCompatActivity {
 
                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                             String uid = user.getUid();
-
+                            Log.e("User id:_----------------", uid);
                             // add new child of Users for new user
                             myRef.child(uid).setValue("");
                             myRef.child(uid).child("email").setValue(user.getEmail());
 
-                            startActivity(new Intent(getApplicationContext(), TakeSelfie.class));
+                            Log.e("User email:_----------------", user.getEmail());
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
 
                         } else {
                             Toast.makeText(RegisterActivity.this, "Error!" + task.getException().getMessage(), Toast.LENGTH_SHORT).show();

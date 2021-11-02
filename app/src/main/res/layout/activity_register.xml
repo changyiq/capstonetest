@@ -81,6 +81,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
         android:layout_marginEnd="11dp"
         android:text="OR"
         android:textColor="@color/black"
@@ -88,7 +89,8 @@
         app:layout_constraintBottom_toTopOf="@+id/divider1"
         app:layout_constraintEnd_toStartOf="@+id/divider2"
         app:layout_constraintStart_toEndOf="@+id/divider1"
-        app:layout_constraintTop_toTopOf="@+id/divider1" />
+        app:layout_constraintTop_toBottomOf="@+id/fbLogInButton"
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/etRegUsername"
@@ -134,7 +136,7 @@
     <Button
         android:id="@+id/btnSignUp"
         android:layout_width="214dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:backgroundTint="@color/com_facebook_button_send_background_color_pressed"
         android:text="Sign up"
