@@ -219,9 +219,12 @@ class TakeSelfie : AppCompatActivity() {
 
                     // debugging
                     Log.e("Response in takeSelfie-----------", responseFromApi)
+                    /**
+                     * WAITING FOR CONFIGURE
+                     */
                     Toast.makeText(
                         this,
-                        "Response: \nPath are posted to API. \n${responseFromApi}\n${response.data}\n${response.headers}",
+                        "Response: \nPath are posted to API. \n${responseFromApi} \n Acne and Rosacea Photos",
                         Toast.LENGTH_LONG
                     ).show()
                 } catch (e: Exception) {

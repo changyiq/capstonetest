@@ -33,10 +33,6 @@ class Result : AppCompatActivity() {
     private lateinit var skinProblem: TextView
     private lateinit var hybirdLink1: TextView
     private lateinit var hybirdLink2: TextView
-    private lateinit var memeImageView: ImageView
-    private lateinit var resultText: TextView
-    private lateinit var database: Firebase
-    private lateinit var ref: DatabaseReference
     private lateinit var picPath: String
     private lateinit var symptom: String
     private lateinit var linkList: List<String>
@@ -63,9 +59,12 @@ class Result : AppCompatActivity() {
 
         //Get intent obj
         val intent = getIntent()
-        picPath = intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY).toString()
-        receivedImage = intent.getByteArrayExtra("ImageFile")!!
-        Log.e("picPath in result---------------", picPath)
+        if (intent != null) {
+            picPath = intent.getStringExtra(TakeSelfie.EXTRA_FULLDIRECTORY).toString()
+            if (intent.getByteArrayExtra("ImageFile") != null) {
+                receivedImage = intent.getByteArrayExtra("ImageFile")!!
+            }
+        }
 
         btnAgain.setOnClickListener {
             val intent3 = Intent(this, TakeSelfie::class.java)
@@ -91,8 +90,12 @@ class Result : AppCompatActivity() {
     private fun getUser(){
         val user = FirebaseAuth.getInstance().currentUser
         val email = user?.email.toString()
+        if (user != null && email != null) {
+            binding3.tv2.text = "Hi $email"
+        }else{
+            binding3.tv2.text = "Please login"
+        }
 
-        binding3.tv2.text = "Hi $email"
     }
 
     @SuppressLint("SetTextI18n")
@@ -106,13 +109,16 @@ class Result : AppCompatActivity() {
         val uid = user?.uid
 
         // Retrieving result value from textView which is from api
-        resultFromResponse = skinProblem.text.toString()
+//        resultFromResponse = skinProblem.text.toString()
+        resultFromResponse = "Acne and Rosacea Photos"
+        Log.e("TextView Result-----------", resultFromResponse)
 
         // code to get the response from api and filter the keyword of the symptom and provide user
         // medical resources
         for(sym in SymptomEnum.values()){
             if (resultFromResponse.contains(sym.symptom)){
                 symptom = sym.symptom
+                Log.e("Symtom-----------", symptom)
             }else{
                 //Toast.makeText(this, "Cannot be diagnosed", Toast.LENGTH_SHORT).show()
             }
@@ -126,8 +132,11 @@ class Result : AppCompatActivity() {
                    //symptom = SymptomEnum.AR.symptom
                     myRef.child(uid.toString()).child("result").setValue(symptom)
                     if (getWebsite(symptom).isNotEmpty()) {
+                        if (getWebsite(symptom).size > 1) {
+                            hybirdLink1.text = getWebsite(symptom)[0]
+                            hybirdLink2.text = getWebsite(symptom)[1]
+                        }
                         hybirdLink1.text = getWebsite(symptom)[0]
-                        hybirdLink2.text = getWebsite(symptom)[1]
                         // pass the url info based on the clicked link
                         val intent = Intent(this, Website::class.java)
                         hybirdLink1.setOnClickListener() {
@@ -229,10 +238,14 @@ class Result : AppCompatActivity() {
                 // Process the json
                 try {
                     // pass value on UI textView from received result
-                    skinProblem.text = response.toString()
+                    skinProblem.text = "Acne and Rosacea Photos"
+//                    skinProblem.text = response.toString()
+                    /**
+                     * WAITING FOR CONFIGURE
+                     */
                     Toast.makeText(
                         this,
-                        "Response: \n$response",
+                        "Response: \nAcne and Rosacea Photos",
                         Toast.LENGTH_LONG
                     ).show()
                 } catch (e: Exception) {
