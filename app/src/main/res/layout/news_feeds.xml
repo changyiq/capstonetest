@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="20dp"
     android:layout_marginEnd="20dp"
-    android:background="@drawable/gradient3"
     android:clickable="true"
     app:cardBackgroundColor="@color/browser_actions_bg_grey"
     app:cardCornerRadius="15dp"
