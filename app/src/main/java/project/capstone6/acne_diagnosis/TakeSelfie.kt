@@ -34,6 +34,7 @@ import java.security.cert.X509Certificate
 import javax.net.ssl.*
 
 import com.android.volley.toolbox.Volley
+import project.capstone6.acne_diagnosis.infrastructure.*
 
 private const val FILE_NAME = "selfie"
 
@@ -106,6 +107,7 @@ class TakeSelfie : AppCompatActivity() {
                 val intent = Intent(this, Result::class.java)
 
                 //upload image to API by Volley
+
                 postImageByVolley(takenImage)
                 Log.w("Response in takeSelfie btnClick-----------", responseFromApi)
                 intent.putExtra(RESPONSE_BY_API, responseFromApi)
@@ -131,7 +133,7 @@ class TakeSelfie : AppCompatActivity() {
     //to create a file for the selfie
     private fun getPhotoFile(fileName: String): File {
         val storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(fileName, ".jpg", storageDirectory)
+        return File.createTempFile(fileName, ".png", storageDirectory)
     }
 
     //to Retrieve the selfie， display it in an ImageView and upload into Firebase cloud
@@ -201,11 +203,11 @@ class TakeSelfie : AppCompatActivity() {
 
     // send http post request to communicate with api and get the response with its header
     fun postImageByVolley(image: Bitmap) {
-        val url2: String = "https://10.0.2.2:5001/api/Image"
+        val url2: String = "https://10.0.2.2:44374/api/Image"
 
         //converting image to bytes/base64 string
         val baos = ByteArrayOutputStream()
-        image.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        image.compress(Bitmap.CompressFormat.PNG, 100, baos)
         val imageBytes = baos.toByteArray() // get data from drawabale
 
         //sending image to server
@@ -262,6 +264,8 @@ class TakeSelfie : AppCompatActivity() {
         // Add the volley post request to the request queue
         Volley.newRequestQueue(this).add(request2)
     }
+
+
 
     //process menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

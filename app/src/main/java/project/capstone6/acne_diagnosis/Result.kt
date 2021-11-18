@@ -297,7 +297,7 @@ class Result : AppCompatActivity() {
 
     // sending request to get the result response from api
     fun getResultFromVolley(image: ByteArray) {
-        val url2: String = "https://10.0.2.2:5001/api/Image"
+        val url2: String = "https://10.0.2.2:44374/api/Image"
 
         // converting to image encoded string
         val imageString = Base64.encodeToString(image, Base64.DEFAULT)

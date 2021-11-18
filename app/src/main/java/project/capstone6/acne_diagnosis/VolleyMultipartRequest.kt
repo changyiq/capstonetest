@@ -27,7 +27,7 @@ open class VolleyMultipartRequest(
     }
 
     override fun getBodyContentType(): String? {
-        return "text/plain; charset=utf-8"
+        return "form-data"
     }
 
     @Throws(AuthFailureError::class)
