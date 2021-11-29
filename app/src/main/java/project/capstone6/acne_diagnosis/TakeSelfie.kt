@@ -29,12 +29,19 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
 import android.annotation.SuppressLint
+import android.os.AsyncTask
+import android.os.StrictMode
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import javax.net.ssl.*
-
 import com.android.volley.toolbox.Volley
+import org.json.JSONObject
+import project.capstone6.acne_diagnosis.apis.ImageApi
 import project.capstone6.acne_diagnosis.infrastructure.*
+import project.capstone6.acne_diagnosis.models.ApiImageBody
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 
 private const val FILE_NAME = "selfie"
 
@@ -48,6 +55,7 @@ class TakeSelfie : AppCompatActivity() {
     private lateinit var photoFile: File
     private lateinit var fileProvider: Uri
     private lateinit var takenImage: Bitmap
+    private lateinit var apiClient: ApiClient
 
     private lateinit var subDir: String
     private lateinit var fullDir: String
@@ -65,6 +73,9 @@ class TakeSelfie : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
 
         binding2 = ActivityTakeSelfieBinding.inflate(LayoutInflater.from(this))
         setContentView(binding2.root)
@@ -97,7 +108,8 @@ class TakeSelfie : AppCompatActivity() {
                 Toast.makeText(this, "Unable to open camera", Toast.LENGTH_LONG).show()
             }
         }
-        btnDiagnosis.setOnClickListener {
+
+        btnDiagnosis.setOnClickListener{
 
             if (subDir != "" && subDir != null) {
 
@@ -106,11 +118,12 @@ class TakeSelfie : AppCompatActivity() {
                 // call intent to go to result page
                 val intent = Intent(this, Result::class.java)
 
-                //upload image to API by Volley
+//                //upload image to API by Volley
+//                postImageByVolley(takenImage)
+//                Log.w("Response in takeSelfie btnClick-----------", responseFromApi)
 
-                postImageByVolley(takenImage)
-                Log.w("Response in takeSelfie btnClick-----------", responseFromApi)
-                intent.putExtra(RESPONSE_BY_API, responseFromApi)
+
+                //intent.putExtra(RESPONSE_BY_API, responseFromApi)
 
                 // pass image
                 val baos = ByteArrayOutputStream()
@@ -118,6 +131,33 @@ class TakeSelfie : AppCompatActivity() {
                 val imageBytes = baos.toByteArray()
                 intent.putExtra("ImageFile", imageBytes)
 
+                val thread = Thread {
+                    try {
+                        var result = ImageApi("https://10.0.2.2:44374")
+                        Log.e("URL is----", result.baseUrl)
+                        var apiImageBody = ApiImageBody("", imageBytes.toTypedArray())
+                        Log.e("apiImageBody is----", apiImageBody.imageSource+apiImageBody.imageFile)
+                        result.apiImagePost(apiImageBody.imageSource, apiImageBody.imageFile)
+                        Log.e("Posting......----", "Trying to post image")
+
+                        responseFromApi = apiClient.finalResponse.message
+                        Log.e("Response From Api Through okhttp: ", responseFromApi)
+
+                    } catch (e: java.lang.Exception) {
+                        Log.e("EXCEPTION----", e.message +"\n"+e.localizedMessage+"\n"+e.cause)
+                    }
+                }
+                thread.start()
+//                try {
+//                    var result = ImageApi("https://10.0.2.2:44374")
+//                    var apiImageBody = ApiImageBody("", imageBytes.toTypedArray())
+//                    result.apiImagePost(apiImageBody.imageSource, apiImageBody.imageFile)
+//
+//                    responseFromApi = apiClient.finalResponse.message
+//                    Log.e("Response From Api Through okhttp: ", responseFromApi)
+//                }catch (e: RejectedExecutionException){
+//                    e.printStackTrace()
+//                }
                 //pass fulldirectory information to Result page
                 intent.putExtra(EXTRA_FULLDIRECTORY, fullDir)
                 intent.putExtra(EXTRA_SUBDIRECTORY, subDir)
@@ -145,7 +185,8 @@ class TakeSelfie : AppCompatActivity() {
             imageView.setImageBitmap(takenImage)
 
             //uploadImage(this, fileProvider)
-            subDir = FirebaseStorageManager().uploadImage(this, fileProvider)
+            subDir = project.capstone6.acne_diagnosis.FirebaseStorageManager()
+                .uploadImage(this, fileProvider)
             fullDir = "gs://acne-diagnosis-6a653.appspot.com/" + subDir
             Toast.makeText(this, "Selfie upload to Firebase", Toast.LENGTH_SHORT).show()
 

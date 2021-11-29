@@ -11,7 +11,6 @@
  */
 package project.capstone6.acne_diagnosis.models
 
-
 /**
  * 
  * @param imageSource 

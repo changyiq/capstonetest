@@ -42,6 +42,7 @@
         <entry key="app/src/main/res/layout/activity_website.xml" value="0.2028985507246377" />
         <entry key="app/src/main/res/layout/news_feeds.xml" value="0.30570652173913043" />
         <entry key="app/src/main/res/menu/menu.xml" value="0.13518518518518519" />
+        <entry key="app/src/main/res/xml/network_security_config.xml" value="0.1" />
       </map>
     </option>
   </component>

@@ -1,11 +1,15 @@
 package project.capstone6.acne_diagnosis.infrastructure
 
 import okhttp3.*
+import project.capstone6.acne_diagnosis.infrastructure.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.File
 
 open class ApiClient(val baseUrl: String) {
+
+    lateinit var finalResponse: Response
+
     companion object {
         protected const val ContentType = "Content-Type"
         protected const val Accept = "Accept"
@@ -53,7 +57,7 @@ open class ApiClient(val baseUrl: String) {
         }
     }
 
-    protected inline fun <reified T : Any?> request(requestConfig: RequestConfig, body: Any? = null): ApiInfrastructureResponse<T?> {
+    protected inline fun <reified T : Any?> request(requestConfig: RequestConfig, body: Any? = null) : ApiInfrastructureResponse<T?> {
         val httpUrl = baseUrl.toHttpUrlOrNull() ?: throw IllegalStateException("baseUrl is invalid.")
 
         var urlBuilder = httpUrl.newBuilder()
@@ -93,34 +97,35 @@ open class ApiClient(val baseUrl: String) {
         headers.forEach { header -> request = request.addHeader(header.key, header.value.toString()) }
 
         val realRequest = request.build()
-        val response = client.newCall(realRequest).execute()
+
+        finalResponse = client.newCall(realRequest).execute()
 
         // TODO: handle specific mapping types. e.g. Map<int, Class<?>>
         when {
-            response.isRedirect -> return Redirection(
-                    response.code,
-                    response.headers.toMultimap()
+            finalResponse.isRedirect -> return Redirection(
+                finalResponse.code,
+                finalResponse.headers.toMultimap()
             )
-            response.isInformational -> return Informational(
-                    response.message,
-                    response.code,
-                    response.headers.toMultimap()
+            finalResponse.isInformational -> return Informational(
+                finalResponse.message,
+                finalResponse.code,
+                finalResponse.headers.toMultimap()
             )
-            response.isSuccessful -> return Success(
-                    responseBody(response.body, accept),
-                    response.code,
-                    response.headers.toMultimap()
+            finalResponse.isSuccessful -> return Success(
+                    responseBody(finalResponse.body, accept),
+                finalResponse.code,
+                finalResponse.headers.toMultimap()
             )
-            response.isClientError -> return ClientError(
-                    response.body?.string(),
-                    response.code,
-                    response.headers.toMultimap()
+            finalResponse.isClientError -> return ClientError(
+                finalResponse.body?.string(),
+                finalResponse.code,
+                finalResponse.headers.toMultimap()
             )
             else -> return ServerError(
                     null,
-                    response.body?.string(),
-                    response.code,
-                    response.headers.toMultimap()
+                finalResponse.body?.string(),
+                finalResponse.code,
+                finalResponse.headers.toMultimap()
             )
         }
     }

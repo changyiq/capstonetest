@@ -86,7 +86,7 @@ class Result : AppCompatActivity() {
         // pass image to analyze
         getUser()
         if (receivedImage.isNotEmpty()) {
-            getResultFromVolley(receivedImage)
+            //getResultFromVolley(receivedImage)
             loadResult()
         }else{
             loadResult()
@@ -176,7 +176,7 @@ class Result : AppCompatActivity() {
 
             // Retrieving result value from textView which is from api
 //        resultFromResponse = skinProblem.text.toString()
-            resultFromResponse = "Acne and Rosacea Photos"
+            ////-------------------resultFromResponse = "Acne and Rosacea Photos"
 
             myRef.child(uid!!).child("result").setValue(resultFromResponse)
             // code to get the response from api and filter the keyword of the symptom and provide user
@@ -269,28 +269,59 @@ class Result : AppCompatActivity() {
     /**
      * Enables https connections
      */
-    @SuppressLint("TrulyRandom")
-    fun handleSSLHandshake() {
-        try {
-            val trustAllCerts: Array<TrustManager> =
-                arrayOf<TrustManager>(object : X509TrustManager {
-                    val acceptedIssuers: Array<Any?>?
-                        get() = arrayOfNulls(0)
+//    @SuppressLint("TrulyRandom")
+//    fun handleSSLHandshake() {
+//        try {
+//            val trustAllCerts: Array<TrustManager> =
+//                arrayOf<TrustManager>(object : X509TrustManager {
+//                    val acceptedIssuers: Array<Any?>?
+//                        get() = arrayOfNulls(0)
+//
+//                    override fun checkClientTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+//                    override fun checkServerTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
+//                    override fun getAcceptedIssuers(): Array<X509Certificate> {
+//                        TODO("Not yet implemented")
+//                    }
+//                })
+//            val sc: SSLContext = SSLContext.getInstance("SSL")
+//            sc.init(null, trustAllCerts, SecureRandom())
+//            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
+//            HttpsURLConnection.setDefaultHostnameVerifier(object : HostnameVerifier {
+//                override fun verify(arg0: String?, arg1: SSLSession?): Boolean {
+//                    return true
+//                }
+//            })
+//        } catch (ignored: java.lang.Exception) {
+//        }
+//    }
 
-                    override fun checkClientTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
-                    override fun checkServerTrusted(certs: Array<X509Certificate?>?, authType: String?) {}
-                    override fun getAcceptedIssuers(): Array<X509Certificate> {
-                        TODO("Not yet implemented")
-                    }
-                })
-            val sc: SSLContext = SSLContext.getInstance("SSL")
-            sc.init(null, trustAllCerts, SecureRandom())
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory())
-            HttpsURLConnection.setDefaultHostnameVerifier(object : HostnameVerifier {
-                override fun verify(arg0: String?, arg1: SSLSession?): Boolean {
-                    return true
+
+
+    @SuppressLint("TrulyRandom")
+     fun handleSSLHandshake() {
+        try {
+            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                override fun getAcceptedIssuers(): Array<X509Certificate?>? {
+                    return arrayOfNulls(0)
+                }
+
+                override fun checkClientTrusted(
+                    certs: Array<X509Certificate?>?,
+                    authType: String?
+                ) {
+                }
+
+                override fun checkServerTrusted(
+                    certs: Array<X509Certificate?>?,
+                    authType: String?
+                ) {
                 }
             })
+            val sc = SSLContext.getInstance("SSL")
+            sc.init(null, trustAllCerts, SecureRandom())
+            HttpsURLConnection
+                .setDefaultSSLSocketFactory(sc.socketFactory)
+            HttpsURLConnection.setDefaultHostnameVerifier { arg0, arg1 -> true }
         } catch (ignored: java.lang.Exception) {
         }
     }
